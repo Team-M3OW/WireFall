@@ -1,0 +1,27 @@
+{
+  "request": {
+    "body_bytes": "302",
+    "method": "POST",
+    "path": "/DVWA/login.php",
+    "protocol": "HTTP/1.1",
+    "request_body": "username=admin&password=password&Login=Login"
+  },
+  "category": 0,
+  "reconstruction_loss": 4.751042365569447e-06,
+  "details": {
+    "combined_score": 1.7199920720789557,
+    "if_prediction": 0,
+    "if_score": 0.45806623383604045,
+    "statistical_anomaly": 0,
+    "z_score": 5.122545933244939,
+    "percentile_anomaly": 0,
+    "reconstruction_error": 4.751042365569447e-06,
+    "perplexity": 1.0000047510700842,
+    "votes": {
+      "iforest": 0,
+      "statistical": 0,
+      "percentile": 0,
+      "total_votes": 0
+    }
+  }
+}

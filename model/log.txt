@@ -1,0 +1,62 @@
+Using device: cuda
+Epoch 1 | Train Loss: 2.0695 | Val Loss: 0.8561
+✓ New best model saved! Val Loss: 0.8561
+Epoch 2 | Train Loss: 0.8199 | Val Loss: 0.7398
+✓ New best model saved! Val Loss: 0.7398
+Checkpoint saved to ./distilbert_http_mlm_epoch2
+Epoch 3 | Train Loss: 0.7457 | Val Loss: 0.6989
+✓ New best model saved! Val Loss: 0.6989
+Epoch 4 | Train Loss: 0.7155 | Val Loss: 0.6890
+✓ New best model saved! Val Loss: 0.6890
+Checkpoint saved to ./distilbert_http_mlm_epoch4
+Epoch 5 | Train Loss: 0.6975 | Val Loss: 0.6724
+✓ New best model saved! Val Loss: 0.6724
+Epoch 6 | Train Loss: 0.6834 | Val Loss: 0.6636
+✓ New best model saved! Val Loss: 0.6636
+Checkpoint saved to ./distilbert_http_mlm_epoch6
+Epoch 7 | Train Loss: 0.6759 | Val Loss: 0.6548
+✓ New best model saved! Val Loss: 0.6548
+Epoch 8 | Train Loss: 0.6677 | Val Loss: 0.6543
+✓ New best model saved! Val Loss: 0.6543
+Checkpoint saved to ./distilbert_http_mlm_epoch8
+Epoch 9 | Train Loss: 0.6639 | Val Loss: 0.6598
+No improvement for 1 epoch(s)
+Epoch 10 | Train Loss: 0.6582 | Val Loss: 0.6547
+No improvement for 2 epoch(s)
+Checkpoint saved to ./distilbert_http_mlm_epoch10
+Epoch 11 | Train Loss: 0.6520 | Val Loss: 0.6390
+✓ New best model saved! Val Loss: 0.6390
+Epoch 12 | Train Loss: 0.6478 | Val Loss: 0.6404
+No improvement for 1 epoch(s)
+Checkpoint saved to ./distilbert_http_mlm_epoch12
+Epoch 13 | Train Loss: 0.6419 | Val Loss: 0.6427
+No improvement for 2 epoch(s)
+Epoch 14 | Train Loss: 0.6406 | Val Loss: 0.6263
+✓ New best model saved! Val Loss: 0.6263
+Checkpoint saved to ./distilbert_http_mlm_epoch14
+Epoch 15 | Train Loss: 0.6376 | Val Loss: 0.6354
+No improvement for 1 epoch(s)
+Epoch 16 | Train Loss: 0.6313 | Val Loss: 0.6229
+✓ New best model saved! Val Loss: 0.6229
+Checkpoint saved to ./distilbert_http_mlm_epoch16
+Epoch 17 | Train Loss: 0.6319 | Val Loss: 0.6326
+No improvement for 1 epoch(s)
+Epoch 18 | Train Loss: 0.6297 | Val Loss: 0.6224
+✓ New best model saved! Val Loss: 0.6224
+Checkpoint saved to ./distilbert_http_mlm_epoch18
+Epoch 19 | Train Loss: 0.6249 | Val Loss: 0.6277
+No improvement for 1 epoch(s)
+Epoch 20 | Train Loss: 0.6234 | Val Loss: 0.6264
+No improvement for 2 epoch(s)
+Checkpoint saved to ./distilbert_http_mlm_epoch20
+Epoch 21 | Train Loss: 0.6239 | Val Loss: 0.6166
+✓ New best model saved! Val Loss: 0.6166
+Epoch 22 | Train Loss: 0.6196 | Val Loss: 0.6195
+No improvement for 1 epoch(s)
+Checkpoint saved to ./distilbert_http_mlm_epoch22
+Epoch 23 | Train Loss: 0.6174 | Val Loss: 0.6207
+No improvement for 2 epoch(s)
+Epoch 24 | Train Loss: 0.6145 | Val Loss: 0.6194
+No improvement for 3 epoch(s)
+Early stopping triggered after 24 epochs
+Final model saved to ./distilbert_http_mlm

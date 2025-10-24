@@ -1,0 +1,7 @@
+{
+  "body_bytes": "302",
+  "method": "POST",
+  "path": "/DVWA/login.php",
+  "protocol": "HTTP/1.1",
+  "request_body": "username=admin&password=password&Login=Login"
+}
