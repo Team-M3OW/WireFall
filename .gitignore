@@ -1,4 +1,4 @@
-# Environment variables
+# Environment
 .env
 .env.local
 .env.*.local
@@ -28,23 +28,28 @@ MANIFEST
 
 # Virtual environments
 venv/
+.venv/
 ENV/
 env/
 
-# Model files (large binary files)
+# Large model artifacts (not committed)
 *.pkl
 *.npy
 *.h5
 *.safetensors
+*.bin
+model/checkpoints/*/pytorch_model.bin
+model/checkpoints/*/model.safetensors
 
-# Node modules
+# Node
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 package-lock.json
+yarn.lock
 
-# Build outputs
+# Build
 dist/
 dist-ssr/
 *.local
@@ -55,6 +60,7 @@ dist-ssr/
 *.swp
 *.swo
 *~
+*.sublime-*
 
 # OS
 .DS_Store
@@ -63,4 +69,19 @@ Thumbs.db
 # Logs
 logs/
 *.log
-distilbert_http_mlm_epoch22
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.coverage.*
+coverage.xml
+
+# Ruff
+.ruff_cache/
+
+# Mypy
+.mypy_cache/
+
+# Docker
+.dockerignore
