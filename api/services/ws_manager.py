@@ -23,3 +23,6 @@ class ConnectionManager:
         for conn in disconnected:
             if conn in self.active_connections:
                 self.active_connections.remove(conn)
+
+
+manager = ConnectionManager()

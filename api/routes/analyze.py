@@ -42,8 +42,9 @@ async def analyze(request_data: RequestData):
 
         collection = get_collection()
         if collection is not None:
+            timestamp = datetime.utcnow()
             doc = {
-                "timestamp": datetime.utcnow(),
+                "timestamp": timestamp,
                 "request": request_data.model_dump(),
                 "analysis": {
                     "is_malicious": is_malicious,
@@ -59,7 +60,7 @@ async def analyze(request_data: RequestData):
             await manager.broadcast(
                 {
                     "_id": doc["_id"],
-                    "timestamp": doc["timestamp"].isoformat(),
+                    "timestamp": timestamp.isoformat(),
                     "method": request_data.method,
                     "path": request_data.path,
                     "request_body": request_data.request_body,
