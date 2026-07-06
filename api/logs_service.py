@@ -1,10 +1,10 @@
 import logging
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pymongo import MongoClient, DESCENDING
+
 from bson import ObjectId
 from dotenv import load_dotenv
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pymongo import DESCENDING, MongoClient
 
 load_dotenv()
 

@@ -1,7 +1,8 @@
-import torch
 import joblib
 import numpy as np
-from transformers import DistilBertTokenizer, DistilBertForMaskedLM
+import torch
+from transformers import DistilBertForMaskedLM, DistilBertTokenizer
+
 from api.config import settings
 
 

@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+
 from api.config import settings
 
 mongo_client: MongoClient | None = None

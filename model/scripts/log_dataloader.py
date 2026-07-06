@@ -1,10 +1,11 @@
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
+
 
 class HTTPLogsDataset(Dataset):
     def __init__(self, csv_file, max_length=128):
         self.df = pd.read_csv(csv_file)
         self.max_length = max_length
-        self.df = self.df.fillna('')
+        self.df = self.df.fillna("")
         self.df = self.df.astype(str)
         self.sequences = self.df.apply(self.build_sequence, axis=1)
 

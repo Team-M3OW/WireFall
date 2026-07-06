@@ -1,13 +1,15 @@
 from datetime import datetime
+
 from fastapi import APIRouter, HTTPException
+
 from api.models.schemas import RequestData
 from api.services.database import get_collection
 from api.services.redis_client import get_redis
 from api.services.ws_manager import manager
-from inference.features import build_sequence, extract_features
 from inference.ensemble import predict_anomaly
-from inference.rule_generator import generate_rule_from_payload
+from inference.features import build_sequence, extract_features
 from inference.model import model_instance
+from inference.rule_generator import generate_rule_from_payload
 
 router = APIRouter()
 
@@ -54,18 +56,20 @@ async def analyze(request_data: RequestData):
             }
             result = collection.insert_one(doc)
             doc["_id"] = str(result.inserted_id)
-            await manager.broadcast({
-                "_id": doc["_id"],
-                "timestamp": doc["timestamp"].isoformat(),
-                "method": request_data.method,
-                "path": request_data.path,
-                "request_body": request_data.request_body,
-                "action_taken": doc["action_taken"],
-                "is_malicious": is_malicious,
-                "reconstruction_loss": rec_error,
-                "perplexity": perplexity,
-                "auto_learned_rule": new_rule,
-            })
+            await manager.broadcast(
+                {
+                    "_id": doc["_id"],
+                    "timestamp": doc["timestamp"].isoformat(),
+                    "method": request_data.method,
+                    "path": request_data.path,
+                    "request_body": request_data.request_body,
+                    "action_taken": doc["action_taken"],
+                    "is_malicious": is_malicious,
+                    "reconstruction_loss": rec_error,
+                    "perplexity": perplexity,
+                    "auto_learned_rule": new_rule,
+                }
+            )
 
         return response
 

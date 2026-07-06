@@ -1,4 +1,5 @@
 import re
+
 from transformers import pipeline
 
 _llm_pipe = None

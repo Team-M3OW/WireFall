@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+
 from api.config import settings
 from inference.model import model_instance
 
@@ -35,7 +36,9 @@ def mask_tokens(input_ids, mask_prob=None):
     labels[~masked_indices] = -100
     indices_replaced = torch.bernoulli(torch.full(labels.shape, 0.8, device=device)).bool() & masked_indices
     input_ids[indices_replaced] = model_instance.tokenizer.mask_token_id
-    indices_random = torch.bernoulli(torch.full(labels.shape, 0.5, device=device)).bool() & masked_indices & ~indices_replaced
+    indices_random = (
+        torch.bernoulli(torch.full(labels.shape, 0.5, device=device)).bool() & masked_indices & ~indices_replaced
+    )
     random_words = torch.randint(len(model_instance.tokenizer), labels.shape, dtype=torch.long, device=device)
     input_ids[indices_random] = random_words[indices_random]
     return input_ids, labels

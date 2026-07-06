@@ -1,10 +1,10 @@
-import torch
-from torch.utils.data import Dataset, DataLoader
-from transformers import DistilBertTokenizer, DistilBertForMaskedLM, get_linear_schedule_with_warmup
-from tqdm import tqdm
-import pandas as pd
 import os
+
+import torch
 from log_dataloader import *
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+from transformers import DistilBertForMaskedLM, DistilBertTokenizer, get_linear_schedule_with_warmup
 
 CSV_FILE = "./teamm3ow-waf-dataset/nginx_access_parsed.csv"
 EPOCHS = 30
@@ -18,15 +18,11 @@ PATIENCE = 3
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device:", device)
 
+
 def collate_fn(batch):
-    encodings = tokenizer(
-        batch,
-        padding=True,
-        truncation=True,
-        max_length=MAX_LENGTH,
-        return_tensors='pt'
-    )
+    encodings = tokenizer(batch, padding=True, truncation=True, max_length=MAX_LENGTH, return_tensors="pt")
     return encodings
+
 
 tokenizer = DistilBertTokenizer.from_pretrained(MODEL_PATH)
 model = DistilBertForMaskedLM.from_pretrained(MODEL_PATH)
@@ -37,13 +33,18 @@ val_size = len(dataset) - train_size
 train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
 
 special_tokens = {
-'additional_special_tokens': [
-    '<body_bytes>', '</body_bytes>',
-    '<request_method>', '</request_method>',
-    '<request_path>', '</request_path>',
-    '<request_protocol>', '</request_protocol>',
-    '<request_body>', '</request_body>'
-]
+    "additional_special_tokens": [
+        "<body_bytes>",
+        "</body_bytes>",
+        "<request_method>",
+        "</request_method>",
+        "<request_path>",
+        "</request_path>",
+        "<request_protocol>",
+        "</request_protocol>",
+        "<request_body>",
+        "</request_body>",
+    ]
 }
 
 tokenizer.add_special_tokens(special_tokens)
@@ -55,10 +56,9 @@ val_dataloader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, c
 optimizer = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=0.01)
 total_steps = len(train_dataloader) * EPOCHS
 scheduler = get_linear_schedule_with_warmup(
-    optimizer,
-    num_warmup_steps=int(0.1 * total_steps),
-    num_training_steps=total_steps
+    optimizer, num_warmup_steps=int(0.1 * total_steps), num_training_steps=total_steps
 )
+
 
 def mask_tokens_for_mlm(input_ids, tokenizer, mask_prob=0.15):
     device = input_ids.device
@@ -75,10 +75,13 @@ def mask_tokens_for_mlm(input_ids, tokenizer, mask_prob=0.15):
     labels[~masked_indices] = -100
     indices_replaced = torch.bernoulli(torch.full(labels.shape, 0.8, device=device)).bool() & masked_indices
     input_ids[indices_replaced] = tokenizer.mask_token_id
-    indices_random = torch.bernoulli(torch.full(labels.shape, 0.5, device=device)).bool() & masked_indices & ~indices_replaced
+    indices_random = (
+        torch.bernoulli(torch.full(labels.shape, 0.5, device=device)).bool() & masked_indices & ~indices_replaced
+    )
     random_words = torch.randint(len(tokenizer), labels.shape, dtype=torch.long, device=device)
     input_ids[indices_random] = random_words[indices_random]
     return input_ids, labels
+
 
 def validate(model, dataloader):
     model.eval()
@@ -93,27 +96,24 @@ def validate(model, dataloader):
             masked_input_ids = masked_input_ids.to(device)
             labels = labels.to(device)
 
-            outputs = model(
-                input_ids=masked_input_ids,
-                attention_mask=attention_mask,
-                labels=labels
-            )
+            outputs = model(input_ids=masked_input_ids, attention_mask=attention_mask, labels=labels)
 
             if not torch.isnan(outputs.loss):
                 total_loss += outputs.loss.item()
                 num_batches += 1
 
     model.train()
-    return total_loss / num_batches if num_batches > 0 else float('inf')
+    return total_loss / num_batches if num_batches > 0 else float("inf")
 
-best_val_loss = float('inf')
+
+best_val_loss = float("inf")
 patience_counter = 0
 train_losses = []
 val_losses = []
 
 model.train()
 for epoch in range(EPOCHS):
-    loop = tqdm(train_dataloader, desc=f"Epoch {epoch+1}/{EPOCHS}")
+    loop = tqdm(train_dataloader, desc=f"Epoch {epoch + 1}/{EPOCHS}")
     total_loss = 0.0
     num_batches = 0
 
@@ -125,12 +125,8 @@ for epoch in range(EPOCHS):
         masked_input_ids = masked_input_ids.to(device)
         labels = labels.to(device)
 
-        outputs = model(
-            input_ids=masked_input_ids,
-            attention_mask=attention_mask,
-            labels=labels
-        )
-        
+        outputs = model(input_ids=masked_input_ids, attention_mask=attention_mask, labels=labels)
+
         loss = outputs.loss
 
         if torch.isnan(loss):
@@ -152,7 +148,7 @@ for epoch in range(EPOCHS):
     avg_val_loss = validate(model, val_dataloader)
     val_losses.append(avg_val_loss)
 
-    print(f"Epoch {epoch+1} | Train Loss: {avg_train_loss:.4f} | Val Loss: {avg_val_loss:.4f}")
+    print(f"Epoch {epoch + 1} | Train Loss: {avg_train_loss:.4f} | Val Loss: {avg_val_loss:.4f}")
     if avg_val_loss < best_val_loss:
         best_val_loss = avg_val_loss
         patience_counter = 0
@@ -166,10 +162,10 @@ for epoch in range(EPOCHS):
         print(f"No improvement for {patience_counter} epoch(s)")
 
         if patience_counter >= PATIENCE:
-            print(f"Early stopping triggered after {epoch+1} epochs")
+            print(f"Early stopping triggered after {epoch + 1} epochs")
             break
     if (epoch + 1) % 2 == 0:
-        checkpoint_path = f"{SAVE_PATH}_epoch{epoch+1}"
+        checkpoint_path = f"{SAVE_PATH}_epoch{epoch + 1}"
         os.makedirs(checkpoint_path, exist_ok=True)
         model.save_pretrained(checkpoint_path)
         tokenizer.save_pretrained(checkpoint_path)

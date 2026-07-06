@@ -1,4 +1,5 @@
 import redis as redis_lib
+
 from api.config import settings
 
 redis_client: redis_lib.Redis | None = None

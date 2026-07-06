@@ -1,5 +1,7 @@
 import re
+
 from fastapi import APIRouter, HTTPException
+
 from api.models.schemas import RuleBody
 from api.services.redis_client import get_redis
 

@@ -1,12 +1,11 @@
-import torch
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from transformers import DistilBertTokenizer, DistilBertForMaskedLM
+import torch
 from sklearn.ensemble import IsolationForest
+from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-from scipy import stats
+from transformers import DistilBertForMaskedLM, DistilBertTokenizer
 
 MODEL_PATH = "/content/drive/MyDrive/distilbert_http_mlm_epoch22"
 MAX_LENGTH = 256
@@ -20,6 +19,7 @@ model = DistilBertForMaskedLM.from_pretrained(MODEL_PATH)
 model.to(device)
 model.eval()
 
+
 def build_sequence(row):
     seq = (
         f"[CLS] "
@@ -30,6 +30,7 @@ def build_sequence(row):
         f"<request_body> {row['request_body']} </request_body> [SEP]"
     )
     return seq
+
 
 def mask_tokens(input_ids, tokenizer, mask_prob=0.15):
     device = input_ids.device
@@ -46,19 +47,22 @@ def mask_tokens(input_ids, tokenizer, mask_prob=0.15):
     probability_matrix.masked_fill_(special_tokens_mask, value=0.0)
     masked_indices = torch.bernoulli(probability_matrix).bool()
     if masked_indices.sum() == 0:
-        rand_idx = torch.randint(1, labels.shape[1]-1, (1,), device=device)
+        rand_idx = torch.randint(1, labels.shape[1] - 1, (1,), device=device)
         masked_indices[0, rand_idx] = True
 
     labels[~masked_indices] = -100
     indices_replaced = torch.bernoulli(torch.full(labels.shape, 0.8, device=device)).bool() & masked_indices
     input_ids[indices_replaced] = tokenizer.mask_token_id
-    indices_random = torch.bernoulli(torch.full(labels.shape, 0.5, device=device)).bool() & masked_indices & ~indices_replaced
+    indices_random = (
+        torch.bernoulli(torch.full(labels.shape, 0.5, device=device)).bool() & masked_indices & ~indices_replaced
+    )
     random_words = torch.randint(len(tokenizer), labels.shape, dtype=torch.long, device=device)
     input_ids[indices_random] = random_words[indices_random]
     return input_ids, labels
 
 
 from tqdm import tqdm
+
 
 def extract_features(logs, batch_size=64):
     reconstruction_errors = []
@@ -68,13 +72,9 @@ def extract_features(logs, batch_size=64):
     model.eval()
     with torch.no_grad():
         for i in tqdm(range(0, len(logs), batch_size), desc="Extracting features", ncols=100):
-            batch_logs = logs[i:i+batch_size]
+            batch_logs = logs[i : i + batch_size]
             encodings = tokenizer(
-                batch_logs,
-                padding=True,
-                truncation=True,
-                max_length=MAX_LENGTH,
-                return_tensors='pt'
+                batch_logs, padding=True, truncation=True, max_length=MAX_LENGTH, return_tensors="pt"
             ).to(device)
 
             input_ids = encodings["input_ids"]
@@ -84,10 +84,7 @@ def extract_features(logs, batch_size=64):
             masked_input, labels = mask_tokens(input_ids.clone(), tokenizer)
 
             outputs = model(
-                input_ids=masked_input,
-                attention_mask=attention_mask,
-                labels=labels,
-                output_hidden_states=True
+                input_ids=masked_input, attention_mask=attention_mask, labels=labels, output_hidden_states=True
             )
 
             # Handle batched loss safely
@@ -109,7 +106,6 @@ def extract_features(logs, batch_size=64):
     return reconstruction_errors, cls_embeddings, perplexities
 
 
-
 class AdvancedAnomalyDetector:
     def __init__(self):
         self.isolation_forest = IsolationForest(contamination=0.1, random_state=42)
@@ -119,11 +115,7 @@ class AdvancedAnomalyDetector:
         self.std_error = None
 
     def fit(self, reconstruction_errors, cls_embeddings, perplexities):
-        features = np.column_stack([
-            reconstruction_errors.reshape(-1, 1),
-            perplexities.reshape(-1, 1),
-            cls_embeddings
-        ])
+        features = np.column_stack([reconstruction_errors.reshape(-1, 1), perplexities.reshape(-1, 1), cls_embeddings])
 
         features_scaled = self.scaler.fit_transform(features)
         self.isolation_forest.fit(features_scaled)
@@ -132,17 +124,13 @@ class AdvancedAnomalyDetector:
         self.std_error = reconstruction_errors.std()
         self.threshold_percentile = np.percentile(reconstruction_errors, 95)
 
-        print(f"Fitted detector:")
+        print("Fitted detector:")
         print(f"  Mean error: {self.mean_error:.4f}")
         print(f"  Std error: {self.std_error:.4f}")
         print(f"  95th percentile: {self.threshold_percentile:.4f}")
 
     def predict(self, reconstruction_errors, cls_embeddings, perplexities):
-        features = np.column_stack([
-            reconstruction_errors.reshape(-1, 1),
-            perplexities.reshape(-1, 1),
-            cls_embeddings
-        ])
+        features = np.column_stack([reconstruction_errors.reshape(-1, 1), perplexities.reshape(-1, 1), cls_embeddings])
 
         features_scaled = self.scaler.transform(features)
 
@@ -155,29 +143,28 @@ class AdvancedAnomalyDetector:
         percentile_anomalies = reconstruction_errors > self.threshold_percentile
 
         combined_scores = (
-            0.4 * (-if_scores) +
-            0.3 * z_scores +
-            0.3 * (reconstruction_errors / self.threshold_percentile)
+            0.4 * (-if_scores) + 0.3 * z_scores + 0.3 * (reconstruction_errors / self.threshold_percentile)
         )
 
         ensemble_predictions = (if_predictions == -1) | statistical_anomalies | percentile_anomalies
 
         return {
-            'predictions': ensemble_predictions,
-            'scores': combined_scores,
-            'if_predictions': if_predictions == -1,
-            'statistical_anomalies': statistical_anomalies,
-            'percentile_anomalies': percentile_anomalies,
-            'reconstruction_errors': reconstruction_errors,
-            'z_scores': z_scores
+            "predictions": ensemble_predictions,
+            "scores": combined_scores,
+            "if_predictions": if_predictions == -1,
+            "statistical_anomalies": statistical_anomalies,
+            "percentile_anomalies": percentile_anomalies,
+            "reconstruction_errors": reconstruction_errors,
+            "z_scores": z_scores,
         }
+
 
 if __name__ == "__main__":
     train_df = pd.read_csv(TRAIN_CSV)
     test_df = pd.read_csv(TEST_CSV)
 
-    train_df = train_df.fillna('').astype(str)
-    test_df = test_df.fillna('').astype(str)
+    train_df = train_df.fillna("").astype(str)
+    test_df = test_df.fillna("").astype(str)
 
     train_logs = [build_sequence(row) for _, row in train_df.iterrows()]
     test_logs = [build_sequence(row) for _, row in test_df.iterrows()]
@@ -196,8 +183,8 @@ if __name__ == "__main__":
     print("\nDetecting anomalies...")
     results = detector.predict(test_errors, test_cls, test_perp)
 
-    n_anomalies = results['predictions'].sum()
-    print(f"\nDetected {n_anomalies} anomalies ({n_anomalies/len(test_logs)*100:.2f}%)")
+    n_anomalies = results["predictions"].sum()
+    print(f"\nDetected {n_anomalies} anomalies ({n_anomalies / len(test_logs) * 100:.2f}%)")
     print(f"  Isolation Forest: {results['if_predictions'].sum()}")
     print(f"  Statistical (z>3): {results['statistical_anomalies'].sum()}")
     print(f"  Percentile (95th): {results['percentile_anomalies'].sum()}")
@@ -205,114 +192,143 @@ if __name__ == "__main__":
     plt.figure(figsize=(18, 12))
 
     plt.subplot(3, 3, 1)
-    plt.hist(test_errors[~results['predictions']], bins=50, alpha=0.7, label='Normal', color='green')
-    plt.hist(test_errors[results['predictions']], bins=50, alpha=0.7, label='Anomaly', color='red')
-    plt.xlabel('Reconstruction Error')
-    plt.ylabel('Count')
-    plt.title('Reconstruction Error Distribution')
+    plt.hist(test_errors[~results["predictions"]], bins=50, alpha=0.7, label="Normal", color="green")
+    plt.hist(test_errors[results["predictions"]], bins=50, alpha=0.7, label="Anomaly", color="red")
+    plt.xlabel("Reconstruction Error")
+    plt.ylabel("Count")
+    plt.title("Reconstruction Error Distribution")
     plt.legend()
 
     plt.subplot(3, 3, 2)
     plt.plot(test_errors, alpha=0.6, linewidth=0.5)
-    plt.scatter(np.where(results['predictions'])[0], test_errors[results['predictions']],
-                color='red', s=30, alpha=0.8, label='Anomalies', zorder=5)
-    plt.axhline(detector.threshold_percentile, color='orange', linestyle='--', label='95th percentile')
-    plt.xlabel('Sample Index')
-    plt.ylabel('Reconstruction Error')
-    plt.title('Reconstruction Error Over Time')
+    plt.scatter(
+        np.where(results["predictions"])[0],
+        test_errors[results["predictions"]],
+        color="red",
+        s=30,
+        alpha=0.8,
+        label="Anomalies",
+        zorder=5,
+    )
+    plt.axhline(detector.threshold_percentile, color="orange", linestyle="--", label="95th percentile")
+    plt.xlabel("Sample Index")
+    plt.ylabel("Reconstruction Error")
+    plt.title("Reconstruction Error Over Time")
     plt.legend()
 
     plt.subplot(3, 3, 3)
-    plt.scatter(test_errors, results['scores'], c=results['predictions'], cmap='RdYlGn_r', alpha=0.6)
-    plt.xlabel('Reconstruction Error')
-    plt.ylabel('Combined Anomaly Score')
-    plt.title('Reconstruction vs Combined Score')
-    plt.colorbar(label='Anomaly')
+    plt.scatter(test_errors, results["scores"], c=results["predictions"], cmap="RdYlGn_r", alpha=0.6)
+    plt.xlabel("Reconstruction Error")
+    plt.ylabel("Combined Anomaly Score")
+    plt.title("Reconstruction vs Combined Score")
+    plt.colorbar(label="Anomaly")
 
     plt.subplot(3, 3, 4)
-    plt.hist(results['z_scores'][~results['predictions']], bins=50, alpha=0.7, label='Normal', color='green')
-    plt.hist(results['z_scores'][results['predictions']], bins=50, alpha=0.7, label='Anomaly', color='red')
-    plt.axvline(3, color='black', linestyle='--', label='z=3')
-    plt.xlabel('Z-Score')
-    plt.ylabel('Count')
-    plt.title('Z-Score Distribution')
+    plt.hist(results["z_scores"][~results["predictions"]], bins=50, alpha=0.7, label="Normal", color="green")
+    plt.hist(results["z_scores"][results["predictions"]], bins=50, alpha=0.7, label="Anomaly", color="red")
+    plt.axvline(3, color="black", linestyle="--", label="z=3")
+    plt.xlabel("Z-Score")
+    plt.ylabel("Count")
+    plt.title("Z-Score Distribution")
     plt.legend()
 
     plt.subplot(3, 3, 5)
     from sklearn.decomposition import PCA
+
     pca = PCA(n_components=2)
     test_cls_2d = pca.fit_transform(test_cls)
-    plt.scatter(test_cls_2d[~results['predictions'], 0], test_cls_2d[~results['predictions'], 1],
-                alpha=0.5, s=20, label='Normal', color='green')
-    plt.scatter(test_cls_2d[results['predictions'], 0], test_cls_2d[results['predictions'], 1],
-                alpha=0.8, s=40, label='Anomaly', color='red', marker='x')
-    plt.xlabel('PCA Component 1')
-    plt.ylabel('PCA Component 2')
-    plt.title('[CLS] Embedding Space')
+    plt.scatter(
+        test_cls_2d[~results["predictions"], 0],
+        test_cls_2d[~results["predictions"], 1],
+        alpha=0.5,
+        s=20,
+        label="Normal",
+        color="green",
+    )
+    plt.scatter(
+        test_cls_2d[results["predictions"], 0],
+        test_cls_2d[results["predictions"], 1],
+        alpha=0.8,
+        s=40,
+        label="Anomaly",
+        color="red",
+        marker="x",
+    )
+    plt.xlabel("PCA Component 1")
+    plt.ylabel("PCA Component 2")
+    plt.title("[CLS] Embedding Space")
     plt.legend()
 
     plt.subplot(3, 3, 6)
-    methods = ['Isolation\nForest', 'Statistical\n(z>3)', 'Percentile\n(95th)', 'Ensemble']
+    methods = ["Isolation\nForest", "Statistical\n(z>3)", "Percentile\n(95th)", "Ensemble"]
     counts = [
-        results['if_predictions'].sum(),
-        results['statistical_anomalies'].sum(),
-        results['percentile_anomalies'].sum(),
-        results['predictions'].sum()
+        results["if_predictions"].sum(),
+        results["statistical_anomalies"].sum(),
+        results["percentile_anomalies"].sum(),
+        results["predictions"].sum(),
     ]
-    plt.bar(methods, counts, color=['steelblue', 'orange', 'purple', 'red'])
-    plt.ylabel('Number of Anomalies')
-    plt.title('Anomalies by Method')
+    plt.bar(methods, counts, color=["steelblue", "orange", "purple", "red"])
+    plt.ylabel("Number of Anomalies")
+    plt.title("Anomalies by Method")
     plt.xticks(rotation=0)
 
     plt.subplot(3, 3, 7)
-    plt.hist(test_perp[~results['predictions']], bins=50, alpha=0.7, label='Normal', color='green')
-    plt.hist(test_perp[results['predictions']], bins=50, alpha=0.7, label='Anomaly', color='red')
-    plt.xlabel('Perplexity')
-    plt.ylabel('Count')
-    plt.title('Perplexity Distribution')
+    plt.hist(test_perp[~results["predictions"]], bins=50, alpha=0.7, label="Normal", color="green")
+    plt.hist(test_perp[results["predictions"]], bins=50, alpha=0.7, label="Anomaly", color="red")
+    plt.xlabel("Perplexity")
+    plt.ylabel("Count")
+    plt.title("Perplexity Distribution")
     plt.legend()
 
     plt.subplot(3, 3, 8)
-    normal_errors = test_errors[~results['predictions']]
-    anomaly_errors = test_errors[results['predictions']]
-    plt.boxplot([normal_errors, anomaly_errors], labels=['Normal', 'Anomaly'])
-    plt.ylabel('Reconstruction Error')
-    plt.title('Error Distribution by Class')
-    plt.grid(axis='y', alpha=0.3)
+    normal_errors = test_errors[~results["predictions"]]
+    anomaly_errors = test_errors[results["predictions"]]
+    plt.boxplot([normal_errors, anomaly_errors], labels=["Normal", "Anomaly"])
+    plt.ylabel("Reconstruction Error")
+    plt.title("Error Distribution by Class")
+    plt.grid(axis="y", alpha=0.3)
 
     plt.subplot(3, 3, 9)
-    plt.plot(results['scores'], alpha=0.6, linewidth=0.5)
-    plt.scatter(np.where(results['predictions'])[0], results['scores'][results['predictions']],
-                color='red', s=30, alpha=0.8, label='Anomalies')
-    plt.xlabel('Sample Index')
-    plt.ylabel('Combined Score')
-    plt.title('Combined Anomaly Scores')
+    plt.plot(results["scores"], alpha=0.6, linewidth=0.5)
+    plt.scatter(
+        np.where(results["predictions"])[0],
+        results["scores"][results["predictions"]],
+        color="red",
+        s=30,
+        alpha=0.8,
+        label="Anomalies",
+    )
+    plt.xlabel("Sample Index")
+    plt.ylabel("Combined Score")
+    plt.title("Combined Anomaly Scores")
     plt.legend()
 
     plt.tight_layout()
-    plt.savefig('advanced_mlm_results.png', dpi=150)
+    plt.savefig("advanced_mlm_results.png", dpi=150)
     print("\nSaved plot to advanced_mlm_results.png")
     plt.show()
     print("\nTop 15 Anomalies (by combined score):")
-    top_indices = np.argsort(results['scores'])[-15:][::-1]
+    top_indices = np.argsort(results["scores"])[-15:][::-1]
     for rank, idx in enumerate(top_indices, 1):
         print(f"\n[{rank}] Combined Score: {results['scores'][idx]:.4f}")
         print(f"    Reconstruction Error: {test_errors[idx]:.4f}")
         print(f"    Z-Score: {results['z_scores'][idx]:.2f}")
-        print(f"    IF: {'✓' if results['if_predictions'][idx] else '✗'} | "
-              f"Stat: {'✓' if results['statistical_anomalies'][idx] else '✗'} | "
-              f"Perc: {'✓' if results['percentile_anomalies'][idx] else '✗'}")
+        print(
+            f"    IF: {'✓' if results['if_predictions'][idx] else '✗'} | "
+            f"Stat: {'✓' if results['statistical_anomalies'][idx] else '✗'} | "
+            f"Perc: {'✓' if results['percentile_anomalies'][idx] else '✗'}"
+        )
         print(f"    {test_logs[idx][:100]}...")
     y_true = np.zeros(len(test_logs), dtype=int)
     y_true[1300:] = 1  # first 0–1300 normal, rest anomalies
 
     # Predictions from your detector (True=anomaly)
-    y_pred = results['predictions'].astype(int)
+    y_pred = results["predictions"].astype(int)
     cm = confusion_matrix(y_true, y_pred)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Normal', 'Anomaly'])
-    disp.plot(cmap='Blues', values_format='d')
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["Normal", "Anomaly"])
+    disp.plot(cmap="Blues", values_format="d")
     plt.title("Confusion Matrix – MLM + Isolation Forest Ensemble")
-    plt.savefig('confusion_matrix.png', dpi=150)
+    plt.savefig("confusion_matrix.png", dpi=150)
     plt.show()
 
     print("\nConfusion Matrix:")
@@ -327,18 +343,13 @@ if __name__ == "__main__":
             f.write(f"Reconstruction Error: {results['reconstruction_errors'][idx]:.4f}\n")
             f.write(f"Z-Score: {results['z_scores'][idx]:.2f}\n")
             f.write(f"Snippet: {test_logs[idx][:150]}...\n")
-            f.write("="*80 + "\n")
+            f.write("=" * 80 + "\n")
 
     print(f"\nSaved wrong predictions ({len(wrong_indices)}) to wrong_predictions.txt")
-    np.save("/content/drive/MyDrive/train_features.npy", {
-        'errors': train_errors,
-        'cls_embeddings': train_cls,
-        'perplexities': train_perp
-    })
-    np.save("test_features.npy", {
-        'errors': test_errors,
-        'cls_embeddings': test_cls,
-        'perplexities': test_perp
-    })
+    np.save(
+        "/content/drive/MyDrive/train_features.npy",
+        {"errors": train_errors, "cls_embeddings": train_cls, "perplexities": train_perp},
+    )
+    np.save("test_features.npy", {"errors": test_errors, "cls_embeddings": test_cls, "perplexities": test_perp})
 
     print("\nSaved extracted features to train_features.npy and test_features.npy")

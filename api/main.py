@@ -1,13 +1,14 @@
 import logging
+
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
 
 from api.config import settings
-from api.services.database import connect_mongo, close_mongo
-from api.services.redis_client import connect_redis, close_redis
+from api.routes import analyze, health, logs, modes, pass_request, rules, ws
+from api.services.database import close_mongo, connect_mongo
+from api.services.redis_client import close_redis, connect_redis
 from inference.model import model_instance
-from api.routes import analyze, health, logs, rules, modes, pass_request, ws
 
 load_dotenv()
 

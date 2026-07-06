@@ -1,6 +1,7 @@
 from fastapi import APIRouter
-from api.services.redis_client import get_redis
+
 from api.services.database import mongo_client
+from api.services.redis_client import get_redis
 from inference.model import model_instance
 
 router = APIRouter()

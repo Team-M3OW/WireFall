@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+
 from api.services.database import get_collection
 
 router = APIRouter()
