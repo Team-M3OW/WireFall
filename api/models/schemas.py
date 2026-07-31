@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 
 class RequestData(BaseModel):
+    tenant_id: str = "default"
     method: str
     path: str
     protocol: str

@@ -8,3 +8,6 @@ accelerate
 pika
 scikit-learn
 joblib
+langchain
+langchain-huggingface
+langgraph
