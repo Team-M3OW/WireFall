@@ -2,7 +2,7 @@
 
 This document maps out the exact lifecycle of an HTTP request as it traverses the WireFall architecture under every possible condition. 
 
-By understanding these 9 cases, you can demonstrate exactly how the system behaves across the Edge Layer, the ML Engine, and the Agentic Background Workers.
+By understanding these 10 cases, you can demonstrate exactly how the system behaves across the Edge Layer, the ML Engine, Agentic Workers, and the Offline Training Pipelines.
 
 ## Case 1: The Known Attack (The Fast Path)
 **Scenario:** An attacker sends a classic SQL injection (`' OR 1=1--`) that WireFall has previously learned about.
@@ -90,4 +90,14 @@ By understanding these 9 cases, you can demonstrate exactly how the system behav
 4. The Nginx Lua edge script for Customer B checks `waf:customer_b:rules:regex`.
 5. Because the rule was isolated to Customer A's namespace, Customer B's edge layer misses it.
 6. The payload passes to FastAPI, where PyTorch detects it and triggers a separate rule generation process for Customer B.
-**Result:** Strict data isolation. Customer A's custom security rules can never accidentally block or interfere with Customer B's legitimate web traffic, proving enterprise-grade multi-tenancy.
+**Result:** Strict data isolation. Customer A's custom security rules can never accidentally block or interfere with Customer B's legitimate web traffic.
+
+## Case 10: Concept Drift (Continual Learning via LoRA)
+**Scenario:** Hackers invent a completely new syntax for exploiting web apps. Over the course of 3 months, the original DistilBERT model becomes less accurate at detecting them (Concept Drift).
+1. Every night, an offline chron job pulls the MongoDB Audit Logs, specifically looking for edge cases (e.g., payloads where the ensemble was very uncertain, or manually reported False Positives/Negatives).
+2. The pipeline compiles these logs into a training dataset.
+3. Instead of retraining the entire 66-million parameter DistilBERT model (which is prohibitively expensive), the pipeline uses **LoRA (Low-Rank Adaptation)**.
+4. It freezes the base model and injects small, trainable matrices into the attention layers, fine-tuning them on the new logs using minimal GPU memory.
+5. The pipeline exports the tiny LoRA adapter weights.
+6. The FastAPI backend hot-swaps the new LoRA adapters into the active model instance.
+**Result:** The WAF successfully mitigates "Concept Drift" and adapts to the latest hacker trends automatically overnight, requiring a fraction of the compute costs of traditional retraining.
