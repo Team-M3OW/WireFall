@@ -29,26 +29,54 @@ async def analyze(request_data: RequestData):
     if not model_instance.loaded:
         raise HTTPException(status_code=503, detail="Anomaly detection service unavailable")
 
-    try:
-        formatted_log = build_sequence(request_data.model_dump())
-        rec_error, cls_emb, perplexity = extract_features(formatted_log)
-        category, details = predict_anomaly(rec_error, cls_emb, perplexity)
-        is_malicious = bool(category)
+        r = get_redis()
+        payload = request_data.request_body or request_data.path
 
-        response, new_rule = None, None
-        if is_malicious:
-            payload = request_data.request_body or request_data.path
-            new_rule = generate_rule_from_payload(payload)
-            r = get_redis()
-            if new_rule and r:
-                r.sadd("waf:rules:regex", new_rule)
+        # Check Stage 1: Redis Fast-Path Regex Rules
+        matched_existing_rule = None
+        if r:
+            existing_rules = r.smembers("waf:rules:regex")
+            if existing_rules:
+                import re
+                for rule in existing_rules:
+                    rule_str = rule.decode("utf-8") if isinstance(rule, bytes) else rule
+                    clean_pattern = rule_str.replace("(?i)", "")
+                    try:
+                        if re.search(clean_pattern, payload, re.IGNORECASE):
+                            matched_existing_rule = rule_str
+                            break
+                    except Exception:
+                        pass
+
+        if matched_existing_rule:
             response = {
                 "allow": False,
-                "reason": f"Blocked by transformer model (loss: {rec_error:.4f})",
-                "auto_learned_rule": new_rule,
+                "stage1_fast_path": True,
+                "reason": f"Blocked instantly by Stage 1 Static WAF Rule ({matched_existing_rule})",
+                "auto_learned_rule": matched_existing_rule,
             }
+            is_malicious = True
+            rec_error, perplexity = 0.0, 0.0
+            new_rule = matched_existing_rule
         else:
-            response = {"allow": True, "reason": "Passed transformer model analysis."}
+            formatted_log = build_sequence(request_data.model_dump())
+            rec_error, cls_emb, perplexity = extract_features(formatted_log)
+            category, details = predict_anomaly(rec_error, cls_emb, perplexity)
+            is_malicious = bool(category)
+
+            response, new_rule = None, None
+            if is_malicious:
+                new_rule = generate_rule_from_payload(payload)
+                if new_rule and r:
+                    r.sadd("waf:rules:regex", new_rule)
+                response = {
+                    "allow": False,
+                    "stage1_fast_path": False,
+                    "reason": f"Blocked by transformer model (loss: {rec_error:.4f})",
+                    "auto_learned_rule": new_rule,
+                }
+            else:
+                response = {"allow": True, "stage1_fast_path": False, "reason": "Passed transformer model analysis."}
 
         collection = get_collection()
         if collection is not None:

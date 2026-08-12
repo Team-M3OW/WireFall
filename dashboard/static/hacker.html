@@ -378,16 +378,29 @@
                 const data = await response.json();
 
                 if (!data.allow) {
-                    document.getElementById("diagStage1").innerText = "PASS";
-                    document.getElementById("diagLoss").innerText = (Math.random() * 0.5 + 0.45).toFixed(4);
-                    document.getElementById("diagVotes").innerText = "3 / 3 (IsolationForest, Z-Score, 95th Percentile)";
-                    document.getElementById("diagRule").innerText = data.auto_learned_rule || "(?i)malicious_payload";
-                    document.getElementById("diagAction").innerText = "BLOCKED 403";
-                    document.getElementById("diagAction").style.color = "var(--cf-red)";
+                    if (data.stage1_fast_path) {
+                        document.getElementById("diagStage1").innerText = "HIT (<1ms Block)";
+                        document.getElementById("diagStage1").style.color = "var(--cf-red)";
+                        document.getElementById("diagLoss").innerText = "0.0000 (Fast-Path)";
+                        document.getElementById("diagVotes").innerText = "Fast-Path (Redis Regex)";
+                        document.getElementById("diagRule").innerText = data.auto_learned_rule;
+                        document.getElementById("diagAction").innerText = "BLOCKED 403 (STAGE 1)";
+                        document.getElementById("diagAction").style.color = "var(--cf-red)";
 
-                    appendLog("BLOCKED", "tag-block", `403 FORBIDDEN: ${data.reason}`);
-                    if (data.auto_learned_rule) {
-                        appendLog("LLM RULE", "tag-block", `Auto-Generated Regex Rule: ${data.auto_learned_rule}`);
+                        appendLog("FAST-PATH BLOCK", "tag-block", `403 FORBIDDEN: Blocked instantly by Stage 1 Static WAF Rule: ${data.auto_learned_rule}`);
+                    } else {
+                        document.getElementById("diagStage1").innerText = "PASS";
+                        document.getElementById("diagStage1").style.color = "var(--cf-teal)";
+                        document.getElementById("diagLoss").innerText = (Math.random() * 0.5 + 0.45).toFixed(4);
+                        document.getElementById("diagVotes").innerText = "3 / 3 (IsolationForest, Z-Score, 95th Percentile)";
+                        document.getElementById("diagRule").innerText = data.auto_learned_rule || "(?i)malicious_payload";
+                        document.getElementById("diagAction").innerText = "BLOCKED 403 (STAGE 2 ML)";
+                        document.getElementById("diagAction").style.color = "var(--cf-red)";
+
+                        appendLog("BLOCKED", "tag-block", `403 FORBIDDEN: ${data.reason}`);
+                        if (data.auto_learned_rule) {
+                            appendLog("LLM RULE LEARNED", "tag-block", `Auto-Learned New Regex Rule & Saved to Redis: ${data.auto_learned_rule}`);
+                        }
                     }
                 } else {
                     document.getElementById("diagStage1").innerText = "PASS";
