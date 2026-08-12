@@ -43,7 +43,8 @@ if ok and combined_input ~= "" then
     local rules, err = red:smembers("waf:rules:regex")
     if rules then
         for _, rule in ipairs(rules) do
-            if ngx.re.find(combined_input, rule, "ijo") then
+            local clean_rule = rule:gsub("\\ ", " "):gsub("\\-", "-"):gsub("\\'", "'")
+            if ngx.re.find(combined_input, clean_rule, "ijo") or ngx.re.find(combined_input, rule, "ijo") then
                 ngx.log(ngx.INFO, "BLOCK: Stage 1 Redis Regex matched rule: ", rule)
                 ngx.header.content_type = "text/html"
                 ngx.status = ngx.HTTP_FORBIDDEN
