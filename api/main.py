@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.config import settings
-from api.routes import analyze, health, logs, modes, pass_request, rules, ws
+from api.routes import analyze, health, logs, modes, pass_request, rules, simulate, ws
 from api.services.database import close_mongo, connect_mongo
 from api.services.redis_client import close_redis, connect_redis
 from inference.model import model_instance
@@ -50,6 +50,7 @@ app.include_router(logs.router)
 app.include_router(rules.router)
 app.include_router(modes.router)
 app.include_router(pass_request.router)
+app.include_router(simulate.router)
 app.include_router(ws.router)
 
 

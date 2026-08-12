@@ -33,8 +33,42 @@ class WAFDashboard {
         this.eventId = 0;
         this.api = new WAFDashboardAPI(this.config.apiBaseUrl);
         this.isConnected = false;
+        this.isSimulating = false;
 
         this.init();
+    }
+
+    async toggleSimulation() {
+        const btn = document.getElementById('simToggleBtn');
+        if (!this.isSimulating) {
+            try {
+                await fetch(`${this.config.apiBaseUrl}/simulate/start`, { method: 'POST' });
+                this.isSimulating = true;
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-stop"></i> Stop Traffic Simulator';
+                    btn.style.borderColor = 'var(--cf-red)';
+                    btn.style.color = 'var(--cf-red)';
+                    btn.style.background = 'var(--cf-red-glow)';
+                }
+                this.addLogEntry('⚡ Traffic simulation engine started (15 concurrent users + scanners)', 'warning');
+            } catch (err) {
+                console.error('Failed to start simulation:', err);
+            }
+        } else {
+            try {
+                await fetch(`${this.config.apiBaseUrl}/simulate/stop`, { method: 'POST' });
+                this.isSimulating = false;
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-play"></i> Start Traffic Simulator';
+                    btn.style.borderColor = 'var(--cf-orange)';
+                    btn.style.color = 'var(--cf-orange)';
+                    btn.style.background = 'var(--cf-orange-glow)';
+                }
+                this.addLogEntry('Traffic simulation stopped', 'info');
+            } catch (err) {
+                console.error('Failed to stop simulation:', err);
+            }
+        }
     }
 
     // ===================================================================
