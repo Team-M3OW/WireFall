@@ -1,32 +1,31 @@
 ngx.req.read_body()
 
--- ===================================================================
--- STAGE 1: REGEX CHECK AGAINST LOCAL REDIS
--- ===================================================================
 local redis = require "resty.redis"
 local cjson = require "cjson"
+local http = require "resty.http"
 
 local red = redis:new()
 red:set_timeout(1000)
 
--- Connect to local Redis
-local ok, err = red:connect("127.0.0.1", 6379)
+local ok, err = red:connect("redis", 6379)
 if not ok then
-    ngx.log(ngx.ERR, "LUA: Failed to connect to local Redis: ", err)
-    return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
+    ngx.log(ngx.WARN, "LUA: Redis connection failed: ", err)
+else
+    local mode, mode_err = red:get("waf:mode")
+    if mode == "off" then
+        ngx.log(ngx.INFO, "LUA: WAF Mode is OFF. Bypassing analysis.")
+        return
+    end
 end
 
--- Collect all input to check
 local request_body = ngx.req.get_body_data() or ""
 local uri_args = ngx.req.get_uri_args()
 local check_strings = {}
 
--- Add request body if exists
 if request_body ~= "" then
     table.insert(check_strings, request_body)
 end
 
--- Add URI arguments if exist
 if uri_args and next(uri_args) ~= nil then
     for key, val in pairs(uri_args) do
         if type(val) == "table" then
@@ -39,32 +38,36 @@ if uri_args and next(uri_args) ~= nil then
     end
 end
 
--- Combine everything into one string to check
 local combined_input = table.concat(check_strings, " ")
 
--- Check rules against combined input
-local rules, err = red:smembers("waf:rules:regex")
-if rules then
-    ngx.log(ngx.INFO, "LUA: Loaded ", #rules, " rules from Redis")
-    for _, rule in ipairs(rules) do
-        if ngx.re.find(combined_input, rule, "ijo") then
-            ngx.log(ngx.INFO, "BLOCK: Stage 1 blocked by regex rule: ", rule)
-            ngx.log(ngx.INFO, "BLOCK: Matched input: ", combined_input)
-            return ngx.exit(ngx.HTTP_FORBIDDEN)
+if ok and combined_input ~= "" then
+    local rules, err = red:smembers("waf:rules:regex")
+    if rules then
+        for _, rule in ipairs(rules) do
+            if ngx.re.find(combined_input, rule, "ijo") then
+                ngx.log(ngx.INFO, "BLOCK: Stage 1 Redis Regex matched rule: ", rule)
+                ngx.header.content_type = "text/html"
+                ngx.status = ngx.HTTP_FORBIDDEN
+                ngx.say([[
+                    <!DOCTYPE html>
+                    <html>
+                    <head><title>403 Forbidden | WireFall WAF Security</title></head>
+                    <body style="background:#090d16; color:#f8fafc; font-family:sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; margin:0;">
+                        <div style="background:#0f172a; border:1px solid #ef4444; border-radius:12px; padding:2rem; text-align:center; max-width:500px;">
+                            <h2 style="color:#ef4444; margin-top:0;">🛡️ 403 Access Denied</h2>
+                            <p style="color:#94a3b8;">This request was blocked by <b>WireFall Stage 1 Static WAF Rule</b> (Redis Fast-Path &lt; 1ms).</p>
+                            <div style="background:#030509; border:1px solid #1e293b; color:#f97316; font-family:monospace; padding:0.75rem; border-radius:6px; font-size:0.85rem; word-break:break-all;">]] .. rule .. [[</div>
+                        </div>
+                    </body>
+                    </html>
+                ]])
+                return ngx.exit(ngx.HTTP_FORBIDDEN)
+            end
         end
     end
 end
-ngx.log(ngx.INFO, "PASS: Stage 1 (Regex) passed.")
 
--- ===================================================================
--- STAGE 2: TRANSFORMER MODEL CHECK
--- ===================================================================
-local http = require "resty.http"
-
--- Build request_body string in the format your transformer expects
 local request_body_str = request_body
-
--- If there are URI arguments, format them as key=value pairs
 if uri_args and next(uri_args) ~= nil then
     local args_parts = {}
     for key, val in pairs(uri_args) do
@@ -79,7 +82,6 @@ if uri_args and next(uri_args) ~= nil then
     request_body_str = table.concat(args_parts, "&")
 end
 
--- Format data according to transformer model's expected schema
 local transformer_data = {
     method = ngx.req.get_method(),
     path = ngx.var.uri,
@@ -87,34 +89,32 @@ local transformer_data = {
     request_body = request_body_str
 }
 
-ngx.log(ngx.INFO, "LUA: Sending to transformer: ", cjson.encode(transformer_data))
-
 local httpc = http:new()
-local res, err = httpc:request_uri("http://127.0.0.1:8001/analyze", {
+httpc:set_timeout(5000)
+local res, err = httpc:request_uri("http://wirefall-api:8001/analyze", {
     method = "POST",
     body = cjson.encode(transformer_data),
     headers = { ["Content-Type"] = "application/json" }
 })
 
-if not res then
-    ngx.log(ngx.ERR, "LUA: Failed to connect to analyzer: ", err)
-    return ngx.exit(ngx.HTTP_SERVICE_UNAVAILABLE)
+if res and res.status == 200 then
+    local report = cjson.decode(res.body)
+    if report and report.allow == false then
+        ngx.header.content_type = "text/html"
+        ngx.status = ngx.HTTP_FORBIDDEN
+        ngx.say([[
+            <!DOCTYPE html>
+            <html>
+            <head><title>403 Forbidden | WireFall WAF Security</title></head>
+            <body style="background:#090d16; color:#f8fafc; font-family:sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; margin:0;">
+                <div style="background:#0f172a; border:1px solid #ef4444; border-radius:12px; padding:2rem; text-align:center; max-width:500px;">
+                    <h2 style="color:#ef4444; margin-top:0;">🛡️ 403 Access Denied</h2>
+                    <p style="color:#94a3b8;">Blocked by <b>WireFall Stage 2 DistilBERT MLM Anomaly Model</b>.</p>
+                    <p style="color:#cbd5e1; font-size:0.9rem;">]] .. (report.reason or "Malicious payload detected") .. [[</p>
+                </div>
+            </body>
+            </html>
+        ]])
+        return ngx.exit(ngx.HTTP_FORBIDDEN)
+    end
 end
-
-ngx.log(ngx.INFO, "LUA: Transformer response: ", res.body)
-
-local report, err = cjson.decode(res.body)
-if not report then
-    ngx.log(ngx.ERR, "LUA: Failed to decode analyzer response: ", err)
-    return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
-end
-
-if report.allow == false then
-    ngx.log(ngx.INFO, "BLOCK: Stage 2 blocked by transformer model")
-    return ngx.exit(ngx.HTTP_FORBIDDEN)
-end
-
-ngx.log(ngx.INFO, "PASS: Stage 2 (Transformer) passed. Proxying to backend.")
-
--- ✅ CRITICAL: Don't return anything here
--- Let nginx continue with proxy_pass directive

