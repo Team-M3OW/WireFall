@@ -30,11 +30,17 @@ async def analyze(request_data: RequestData):
         raise HTTPException(status_code=503, detail="Anomaly detection service unavailable")
 
     r = get_redis()
+    if r is None:
+        from api.services.redis_client import connect_redis
+        r = connect_redis()
     payload = request_data.request_body or request_data.path
 
     matched_existing_rule = None
     if r:
-        existing_rules = r.smembers("waf:rules:regex")
+        try:
+            existing_rules = r.smembers("waf:rules:regex")
+        except Exception:
+            existing_rules = []
         if existing_rules:
             import re
             for rule in existing_rules:
