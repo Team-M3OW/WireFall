@@ -40,7 +40,7 @@ async def analyze(request_data: RequestData):
                 import re
                 for rule in existing_rules:
                     rule_str = rule.decode("utf-8") if isinstance(rule, bytes) else rule
-                    clean_pattern = rule_str.replace("(?i)", "")
+                    clean_pattern = rule_str.replace("(?i)", "").replace("\\ ", " ").replace("\\-", "-").replace("\\'", "'")
                     try:
                         if re.search(clean_pattern, payload, re.IGNORECASE):
                             matched_existing_rule = rule_str
