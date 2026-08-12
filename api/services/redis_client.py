@@ -7,8 +7,10 @@ redis_client: redis_lib.Redis | None = None
 
 def connect_redis():
     global redis_client
+    import os
     try:
-        client = redis_lib.from_url(settings.redis_url, decode_responses=True)
+        redis_url = os.getenv("REDIS_URL") or settings.redis_url
+        client = redis_lib.from_url(redis_url, decode_responses=True)
         client.ping()
         redis_client = client
         return redis_client
