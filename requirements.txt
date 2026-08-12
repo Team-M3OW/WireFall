@@ -1,3 +1,4 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
 fastapi
 uvicorn
 pydantic
@@ -8,3 +9,5 @@ accelerate
 pika
 scikit-learn
 joblib
+pymongo
+python-dotenv
