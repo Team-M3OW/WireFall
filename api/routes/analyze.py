@@ -39,12 +39,9 @@ async def analyze(request_data: RequestData):
             import re
             for rule in existing_rules:
                 rule_str = rule.decode("utf-8") if isinstance(rule, bytes) else rule
-                clean_str = rule_str.replace("(?i)", "").replace("\\ ", " ").replace("\\-", "-").replace("\\'", "'").replace("\\", "")
-                if clean_str and (clean_str.lower() in payload.lower() or payload.lower() in clean_str.lower()):
-                    matched_existing_rule = rule_str
-                    break
-                tokens = [t.lower() for t in re.split(r'[\s\(\)\?\:\-\\\|\^\$\.\*\`\=\'\"]+', rule_str.replace("(?i)", "")) if len(t) >= 4]
-                if tokens and any(t in payload.lower() for t in tokens if t not in ["query", "http"]):
+                clean_p = re.sub(r'(\.\*|\?P\<[^\>]+\>|\(\?\:|\)|\(|\\s\+|[\`\:\-\\\|\^\$]+)', ' ', rule_str.replace("(?i)", "")).strip()
+                kw = [k.lower() for k in re.split(r'[\s\=\'\"]+', clean_p) if len(k) >= 3 and k.lower() not in ["http", "post", "get"]]
+                if len(kw) >= 2 and all(k in payload.lower() for k in kw[:3]):
                     matched_existing_rule = rule_str
                     break
 
