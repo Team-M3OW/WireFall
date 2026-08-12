@@ -2,7 +2,6 @@ ngx.req.read_body()
 
 local redis = require "resty.redis"
 local cjson = require "cjson"
-local http = require "resty.http"
 
 local red = redis:new()
 red:set_timeout(1000)
@@ -89,12 +88,9 @@ local transformer_data = {
     request_body = request_body_str
 }
 
-local httpc = http:new()
-httpc:set_timeout(5000)
-local res, err = httpc:request_uri("http://wirefall-api:8001/analyze", {
-    method = "POST",
-    body = cjson.encode(transformer_data),
-    headers = { ["Content-Type"] = "application/json" }
+local res = ngx.location.capture("/analyze", {
+    method = ngx.HTTP_POST,
+    body = cjson.encode(transformer_data)
 })
 
 if res and res.status == 200 then
