@@ -7,15 +7,17 @@ mongo_client: MongoClient | None = None
 
 def connect_mongo():
     global mongo_client
-    import os
+    import logging, os
     mongo_uri = os.getenv("MONGO_URI") or settings.mongo_uri
     if not mongo_uri:
         return None
     try:
-        mongo_client = MongoClient(mongo_uri)
-        mongo_client.admin.command("ping")
+        client = MongoClient(mongo_uri)
+        client.admin.command("ping")
+        mongo_client = client
         return mongo_client
-    except Exception:
+    except Exception as e:
+        logging.error(f"Mongo connection error: {e}")
         mongo_client = None
         return None
 
