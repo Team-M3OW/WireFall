@@ -3,10 +3,12 @@
 
 class WAFDashboardAPI {
     constructor(baseUrl = null) {
-        const host = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
-        const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'https:' : 'http:';
-        this.baseUrl = baseUrl || `${protocol}//${host}:8001`;
-        this.wsUrl = this.baseUrl.replace('http', 'ws') + '/ws/logs';
+        const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
+        const wsProtocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsHost = typeof window !== 'undefined' ? window.location.host : 'localhost';
+        
+        this.baseUrl = baseUrl || origin;
+        this.wsUrl = `${wsProtocol}//${wsHost}/ws/logs`;
         this.ws = null;
         this.reconnectAttempts = 0;
         this.maxReconnectAttempts = 5;

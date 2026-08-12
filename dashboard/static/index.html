@@ -3,229 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WAF Dashboard | Security Monitor</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>WireFall | Cloudflare Radar WAF Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Header -->
+        <!-- Cloudflare Radar Style Header -->
         <header class="dashboard-header">
             <div class="header-left">
                 <h1 class="dashboard-title">
-                    <i class="fas fa-shield-alt pulse"></i>
-                    WireFall
+                    <i class="fas fa-shield-halved"></i>
+                    WireFall Cloud
+                    <span class="radar-badge">Radar WAF Live</span>
                 </h1>
                 <div class="system-status">
-                    
                     <div class="status-indicator" id="mlStatus">
                         <div class="status-dot ml" id="mlStatusDot"></div>
-                        <span>ML Model</span>
+                        <span>DistilBERT MLM & Qwen2.5 Engine</span>
                     </div>
                 </div>
             </div>
             <div class="header-right">
-                <a href="index.html" class="refresh-btn" style="text-decoration:none; color:#fff; font-size:0.85rem; font-weight:600; padding:0.4rem 0.8rem;"><i class="fas fa-chart-line"></i> Dashboard</a>
-                <a href="hacker.html" class="refresh-btn" style="text-decoration:none; color:#f97316; border-color:#f97316; font-size:0.85rem; font-weight:600; padding:0.4rem 0.8rem;"><i class="fas fa-terminal"></i> Hacker Mode</a>
-                <div class="last-updated">
-                    <i class="fas fa-clock"></i>
-                    <span id="lastUpdated">Last Updated: --:--:--</span>
+                <a href="index.html" class="nav-link active"><i class="fas fa-chart-line"></i> Dashboard</a>
+                <a href="hacker.html" class="nav-link"><i class="fas fa-terminal"></i> Hacker Sandbox</a>
+                <div class="status-indicator" style="margin-left: 0.5rem;">
+                    <i class="fas fa-clock" style="color: var(--cf-orange);"></i>
+                    <span id="lastUpdated" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">Last Updated: --:--:--</span>
                 </div>
-                <button class="refresh-btn" id="refreshBtn">
+                <button class="nav-link" id="refreshBtn" style="border: 1px solid var(--panel-border); cursor: pointer;">
                     <i class="fas fa-sync-alt"></i>
                 </button>
             </div>
         </header>
 
         <div class="dashboard-body">
-            <!-- Control Panel (Left Sidebar) -->
+            <!-- Sidebar Controls -->
             <aside class="control-panel">
                 <div class="panel-section">
-                    <h3>WAF Mode</h3>
+                    <h3>WAF Execution Profile</h3>
                     <div class="toggle-group" id="wafModeToggle">
                         <div class="toggle-option active" data-mode="fast">
                             <div class="toggle-ring"></div>
-                            <i class="fas fa-bolt"></i>
+                            <i class="fas fa-bolt" style="color: var(--cf-orange);"></i>
                             <span>Transformer Only</span>
                         </div>
                         <div class="toggle-option" data-mode="full">
                             <div class="toggle-ring"></div>
-                            <i class="fas fa-puzzle-piece"></i>
-                            <span>Full WAF</span>
+                            <i class="fas fa-shield-cat" style="color: var(--cf-teal);"></i>
+                            <span>Full Hybrid WAF</span>
                         </div>
                         <div class="toggle-option" data-mode="off">
                             <div class="toggle-ring"></div>
-                            <i class="fas fa-volume-mute"></i>
-                            <span>WAF Off</span>
+                            <i class="fas fa-power-off" style="color: var(--cf-red);"></i>
+                            <span>Bypass / Pass-Through</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="panel-section">
-                    <h3>Live Metrics</h3>
+                    <h3>Real-Time Traffic Counters</h3>
                     <div class="metric-card">
                         <div class="metric-icon benign">
-                            <i class="fas fa-check-circle"></i>
+                            <i class="fas fa-shield-check"></i>
                         </div>
                         <div class="metric-content">
-                            <div class="metric-value" id="benignCount">0</div>
+                            <div class="metric-value" id="benignCount" style="color: var(--cf-green);">0</div>
                             <div class="metric-label">Benign Requests</div>
                         </div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-icon malicious">
-                            <i class="fas fa-exclamation-triangle"></i>
+                            <i class="fas fa-bug"></i>
                         </div>
                         <div class="metric-content">
-                            <div class="metric-value" id="maliciousCount">0</div>
-                            <div class="metric-label">Malicious Requests</div>
+                            <div class="metric-value" id="maliciousCount" style="color: var(--cf-red);">0</div>
+                            <div class="metric-label">Malicious Threats</div>
                         </div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-icon total">
-                            <i class="fas fa-tachometer-alt"></i>
+                            <i class="fas fa-network-wired"></i>
                         </div>
                         <div class="metric-content">
-                            <div class="metric-value" id="totalCount">0</div>
-                            <div class="metric-label">Total Requests</div>
+                            <div class="metric-value" id="totalCount" style="color: var(--cf-blue);">0</div>
+                            <div class="metric-label">Total Analyzed</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="panel-section">
-                    <h3>System Health</h3>
-                    <div class="health-indicators">
-                        <div class="health-item">
-                            <span>CPU Usage</span>
-                            <div class="health-bar">
-                                <div class="health-fill" id="cpuUsage" style="width: 45%"></div>
+                    <h3>Node Resource Metrics</h3>
+                    <div class="health-indicators" style="display: flex; flex-direction: column; gap: 0.85rem;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem;">
+                                <span>CPU Usage</span>
+                                <span style="font-family: var(--font-mono);">Standard_B2s_v2</span>
+                            </div>
+                            <div style="height: 6px; background: var(--panel-card); border-radius: 3px; overflow: hidden;">
+                                <div id="cpuUsage" style="width: 45%; height: 100%; background: var(--cf-orange); transition: width 0.5s;"></div>
                             </div>
                         </div>
-                        <div class="health-item">
-                            <span>Memory</span>
-                            <div class="health-bar">
-                                <div class="health-fill" id="memoryUsage" style="width: 62%"></div>
+                        <div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem;">
+                                <span>RAM Allocated</span>
+                                <span style="font-family: var(--font-mono);">3.8 GB / 4.0 GB</span>
                             </div>
-                        </div>
-                        <div class="health-item">
-                            <span>Disk I/O</span>
-                            <div class="health-bar">
-                                <div class="health-fill" id="diskUsage" style="width: 23%"></div>
+                            <div style="height: 6px; background: var(--panel-card); border-radius: 3px; overflow: hidden;">
+                                <div id="memoryUsage" style="width: 62%; height: 100%; background: var(--cf-teal); transition: width 0.5s;"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </aside>
 
-            <!-- Main Content -->
+            <!-- Main Content Area -->
             <main class="main-content">
-                <!-- ECG Graph Section -->
+                <!-- Live Telemetry Graph -->
                 <section class="graph-section">
                     <div class="graph-header">
-                        <h2>Live Request Traffic</h2>
-                        <div class="graph-controls">
-                            <button class="graph-btn" data-timeframe="1m">1M</button>
-                            <button class="graph-btn active" data-timeframe="5m">5M</button>
-                            <button class="graph-btn" data-timeframe="15m">15M</button>
-                            <button class="graph-btn" data-timeframe="1h">1H</button>
+                        <h2><i class="fas fa-chart-area" style="color: var(--cf-orange);"></i> Live Radar Telemetry Stream</h2>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="nav-link active" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">5M</button>
+                            <button class="nav-link" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">15M</button>
+                            <button class="nav-link" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">1H</button>
                         </div>
                     </div>
-                    
-                    <div class="graph-container">
-                        <div class="graph-counters">
-                            <div class="counter benign">
-                                <span class="counter-label">Benign</span>
-                                <span class="counter-value" id="graphBenignCount">0</span>
-                            </div>
-                            <div class="counter malicious">
-                                <span class="counter-label">Malicious</span>
-                                <span class="counter-value" id="graphMaliciousCount">0</span>
-                            </div>
-                            <div class="counter total">
-                                <span class="counter-label">Total</span>
-                                <span class="counter-value" id="graphTotalCount">0</span>
-                            </div>
-                        </div>
-                        
-                        <div class="ecg-chart-container">
-                            <canvas id="ecgChart"></canvas>
-                            <div class="grid-overlay"></div>
-                        </div>
+
+                    <div class="ecg-chart-container">
+                        <canvas id="ecgChart"></canvas>
                     </div>
                 </section>
 
-                <!-- Blocked Requests Table -->
+                <!-- Threat Detection Logs -->
                 <section class="table-section">
                     <div class="table-header">
-                        <h3>Recent Security Events</h3>
-                        <div class="table-controls">
-                            <button class="table-btn" id="filterAll">All</button>
-                            <button class="table-btn active" id="filterMalicious">Malicious</button>
-                            <button class="table-btn" id="filterBlocked">Blocked</button>
-                        </div>
+                        <h2><i class="fas fa-list-ol" style="color: var(--cf-orange);"></i> Threat Detection Log Feed</h2>
                     </div>
-                    
-                    <div class="table-container">
+
+                    <div style="overflow-x: auto;">
                         <table class="events-table">
                             <thead>
                                 <tr>
                                     <th>Timestamp</th>
                                     <th>Source IP</th>
-                                    <th>URL</th>
-                                    <th>Threat Type</th>
-                                    <th>Action</th>
+                                    <th>Path</th>
+                                    <th>Threat Category</th>
+                                    <th>WAF Action</th>
                                     <th>Controls</th>
                                 </tr>
                             </thead>
                             <tbody id="eventsTableBody">
-                                <!-- Table rows will be dynamically populated -->
+                                <!-- Populated dynamically by JS -->
                             </tbody>
                         </table>
                     </div>
                 </section>
             </main>
         </div>
-
-        <!-- Mini Log Viewer -->
-        <div class="log-viewer" id="logViewer">
-            <div class="log-header">
-                <h4>System Logs</h4>
-                <button class="log-toggle" id="logToggle">
-                    <i class="fas fa-chevron-up"></i>
-                </button>
-            </div>
-            <div class="log-content" id="logContent">
-                <div class="log-entry">
-                    <span class="log-time">[10:23:15]</span>
-                    <span class="log-level info">INFO</span>
-                    <span class="log-message">WAF system initialized successfully</span>
-                </div>
-                <div class="log-entry">
-                    <span class="log-time">[10:23:16]</span>
-                    <span class="log-level success">SUCCESS</span>
-                    <span class="log-message">MongoDB connection established</span>
-                </div>
-                <div class="log-entry">
-                    <span class="log-time">[10:23:17]</span>
-                    <span class="log-level info">INFO</span>
-                    <span class="log-message">ML model loaded and ready</span>
-                </div>
-            </div>
-        </div>
     </div>
 
-    <!-- Background Effects -->
-    <div class="background-effects">
-        <div class="particle" style="--delay: 0s; --duration: 10s;"></div>
-        <div class="particle" style="--delay: 2s; --duration: 12s;"></div>
-        <div class="particle" style="--delay: 4s; --duration: 8s;"></div>
-        <div class="particle" style="--delay: 6s; --duration: 14s;"></div>
-        <div class="particle" style="--delay: 1s; --duration: 11s;"></div>
+    <!-- Hidden Log Container for JS compatibility -->
+    <div id="logViewer" style="display: none;">
+        <div id="logToggle"></div>
+        <div id="logContent"></div>
     </div>
 
-    <!-- Load API module first, then integrated dashboard -->
     <script src="dashboard-api.js"></script>
     <script src="dashboard-integrated.js"></script>
 </body>
