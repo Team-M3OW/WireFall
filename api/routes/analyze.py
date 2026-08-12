@@ -40,10 +40,11 @@ async def analyze(request_data: RequestData):
                 import re
                 for rule in existing_rules:
                     rule_str = rule.decode("utf-8") if isinstance(rule, bytes) else rule
-                    # Extract keywords from rule
-                    tokens = [t.lower() for t in re.split(r'[\s\(\)\?\:\-\\\.\*]+', rule_str.replace("(?i)", "")) if len(t) > 3]
+                    # Extract pure text keywords (filter out regex variable syntax like p<admin>, $admin)
+                    raw_tokens = re.split(r'[\s\(\)\?\:\-\\\.\*\$\<\>\=\'\"]+', rule_str.replace("(?i)", ""))
+                    tokens = [t.lower() for t in raw_tokens if len(t) > 3 and not t.startswith("p") and not t.startswith("admin")]
                     try:
-                        if tokens and all(t in payload.lower() for t in tokens[:2]):
+                        if tokens and any(t in payload.lower() for t in tokens):
                             matched_existing_rule = rule_str
                             break
                     except Exception:
