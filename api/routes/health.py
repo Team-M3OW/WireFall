@@ -9,7 +9,7 @@ router = APIRouter()
 
 @router.get("/health")
 async def health_check():
-    is_mongo = db_service.mongo_client is not None
+    is_mongo = db_service.get_mongo() is not None
     is_redis = get_redis() is not None
     is_model = model_instance.loaded
     return {

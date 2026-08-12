@@ -20,10 +20,18 @@ def connect_mongo():
         return None
 
 
-def get_db():
+def get_mongo():
+    global mongo_client
     if mongo_client is None:
+        mongo_client = connect_mongo()
+    return mongo_client
+
+
+def get_db():
+    client = get_mongo()
+    if client is None:
         return None
-    return mongo_client.get_database(settings.mongo_db)
+    return client.get_database(settings.mongo_db)
 
 
 def get_collection():
