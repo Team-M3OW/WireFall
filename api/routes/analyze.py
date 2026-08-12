@@ -39,7 +39,7 @@ async def analyze(request_data: RequestData):
             import re
             for rule in existing_rules:
                 rule_str = rule.decode("utf-8") if isinstance(rule, bytes) else rule
-                clean_pattern = re.sub(r'[\`\(\)\?\:\-\\\|\^\$]+', ' ', rule_str.replace("(?i)", "")).strip()
+                clean_pattern = re.sub(r'(\.\*|\\s\+|[\`\(\)\?\:\-\\\|\^\$]+)', ' ', rule_str.replace("(?i)", "")).strip()
                 clean_pattern = ' '.join(clean_pattern.split())
                 if clean_pattern and (clean_pattern.lower() in payload.lower() or payload.lower() in clean_pattern.lower()):
                     matched_existing_rule = rule_str
