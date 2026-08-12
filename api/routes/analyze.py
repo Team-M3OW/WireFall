@@ -79,11 +79,17 @@ async def analyze(request_data: RequestData):
 
         response, new_rule = None, None
         if is_malicious:
-            new_rule = generate_rule_from_payload(payload)
             if r:
-                if new_rule:
+                try:
+                    r.sadd("waf:rules:exact_payloads", payload)
+                except Exception:
+                    pass
+            new_rule = generate_rule_from_payload(payload)
+            if new_rule and r:
+                try:
                     r.sadd("waf:rules:regex", new_rule)
-                r.sadd("waf:rules:exact_payloads", payload)
+                except Exception:
+                    pass
             response = {
                 "allow": False,
                 "stage1_fast_path": False,
