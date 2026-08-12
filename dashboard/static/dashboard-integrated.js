@@ -15,13 +15,17 @@ class WAFDashboard {
             }
         };
 
+        const host = window.location.hostname || 'localhost';
+        const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+
         this.config = {
             maxDataPoints: 100,
             updateInterval: 5000, // Health check interval
             animationDuration: 500,
             currentTimeframe: '5m',
-            apiBaseUrl: 'http://localhost:8001',
-            wsUrl: 'ws://localhost:8001/ws/logs'
+            apiBaseUrl: `${protocol}//${host}:8001`,
+            wsUrl: `${wsProtocol}//${host}:8001/ws/logs`
         };
 
         this.chart = null;

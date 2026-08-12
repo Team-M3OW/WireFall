@@ -2,9 +2,11 @@
 // This file contains all API integration functions for the WAF Dashboard
 
 class WAFDashboardAPI {
-    constructor(baseUrl = 'http://localhost:8002') {
-        this.baseUrl = baseUrl;
-        this.wsUrl = baseUrl.replace('http', 'ws') + '/ws/logs';
+    constructor(baseUrl = null) {
+        const host = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+        const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'https:' : 'http:';
+        this.baseUrl = baseUrl || `${protocol}//${host}:8001`;
+        this.wsUrl = this.baseUrl.replace('http', 'ws') + '/ws/logs';
         this.ws = null;
         this.reconnectAttempts = 0;
         this.maxReconnectAttempts = 5;
