@@ -40,17 +40,15 @@ async def analyze(request_data: RequestData):
                 import re
                 for rule in existing_rules:
                     rule_str = rule.decode("utf-8") if isinstance(rule, bytes) else rule
-                    clean_pattern = rule_str.replace("(?i)", "").replace("\\ ", " ").replace("\\-", "-").replace("\\'", "'")
+                    # Strip regex constructs to extract core keywords
+                    clean_pattern = re.sub(r'[\(\)\?\:\-\\]+', ' ', rule_str.replace("(?i)", "")).strip()
+                    clean_pattern = ' '.join(clean_pattern.split())
                     try:
-                        clean_lower = clean_pattern.lower()
-                        payload_lower = payload.lower()
-                        if clean_lower in payload_lower or payload_lower in clean_lower or re.search(clean_pattern, payload, re.IGNORECASE):
+                        if clean_pattern and clean_pattern.lower() in payload.lower():
                             matched_existing_rule = rule_str
                             break
                     except Exception:
-                        if clean_pattern.lower() in payload.lower():
-                            matched_existing_rule = rule_str
-                            break
+                        pass
 
         if matched_existing_rule:
             response = {
