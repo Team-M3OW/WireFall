@@ -14,6 +14,16 @@ from inference.rule_generator import generate_rule_from_payload
 router = APIRouter()
 
 
+@router.get("/analyze")
+async def analyze_info():
+    return {
+        "endpoint": "/analyze",
+        "method": "POST",
+        "status": "active" if model_instance.loaded else "unavailable",
+        "usage": "Send POST request with JSON payload containing method, path, protocol, request_body.",
+    }
+
+
 @router.post("/analyze")
 async def analyze(request_data: RequestData):
     if not model_instance.loaded:
