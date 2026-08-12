@@ -33,6 +33,8 @@ async def analyze(request_data: RequestData):
         r = connect_redis()
 
     payload = request_data.request_body or request_data.path
+    import logging
+    logging.info(f"ANALYZE PAYLOAD: '{payload}' (Redis client: {r})")
     matched_existing_rule = None
 
     if r and payload:
