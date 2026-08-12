@@ -73,7 +73,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infrastructure/nginx/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro
       - ./lua/:/etc/nginx/lua/:ro
       - ./dashboard/static/:/var/www/dashboard/:ro
     depends_on:
