@@ -8,10 +8,12 @@ redis_client: redis_lib.Redis | None = None
 def connect_redis():
     global redis_client
     try:
-        redis_client = redis_lib.from_url(settings.redis_url, decode_responses=True)
-        redis_client.ping()
+        client = redis_lib.from_url(settings.redis_url, decode_responses=True)
+        client.ping()
+        redis_client = client
         return redis_client
     except Exception:
+        redis_client = None
         return None
 
 

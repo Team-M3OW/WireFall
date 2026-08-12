@@ -1,0 +1,7 @@
+location            = "eastus"
+resource_group_name = "rg-wirefall-prod"
+environment         = "production"
+vm_size             = "Standard_B2s" # Ideal balance of performance & budget for Azure Student Credits
+admin_username      = "azureuser"
+ssh_public_key_path = "~/.ssh/id_rsa.pub"
+allowed_ssh_cidr    = "*"

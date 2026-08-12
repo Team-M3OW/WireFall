@@ -60,6 +60,21 @@ services:
       mongo:
         condition: service_healthy
 
+  wirefall-worker:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.api
+    command: python3 -m api.services.queue_worker
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - MONGO_URI=mongodb://mongo:27017/waf_db
+      - LOG_LEVEL=INFO
+    depends_on:
+      redis:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+
   openresty:
     image: openresty/openresty:alpine
     ports:
@@ -67,6 +82,7 @@ services:
     volumes:
       - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./lua/:/etc/nginx/lua/:ro
+      - ./dashboard/static/:/var/www/dashboard/:ro
     depends_on:
       - wirefall-api
     networks:
