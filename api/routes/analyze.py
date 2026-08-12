@@ -37,10 +37,12 @@ async def analyze(request_data: RequestData):
 
     if r and payload:
         try:
-            if r.sismember("waf:rules:exact_payloads", payload):
+            is_exact = r.sismember("waf:rules:exact_payloads", payload)
+            if is_exact:
                 matched_existing_rule = "Exact Stage 1 Redis Fast-Path Rule"
-        except Exception:
-            pass
+        except Exception as e:
+            import logging
+            logging.error(f"Redis sismember error: {e}")
 
         if not matched_existing_rule:
             try:
