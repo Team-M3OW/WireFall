@@ -1,5 +1,5 @@
+import re
 from datetime import datetime
-
 from fastapi import APIRouter, HTTPException
 
 from api.models.schemas import RequestData
@@ -13,7 +13,6 @@ from inference.rule_generator import generate_rule_from_payload
 
 router = APIRouter()
 
-
 @router.get("/analyze")
 async def analyze_info():
     return {
@@ -22,7 +21,6 @@ async def analyze_info():
         "status": "active" if model_instance.loaded else "unavailable",
         "usage": "Send POST request with JSON payload containing method, path, protocol, request_body.",
     }
-
 
 @router.post("/analyze")
 async def analyze(request_data: RequestData):
@@ -33,27 +31,35 @@ async def analyze(request_data: RequestData):
     if r is None:
         from api.services.redis_client import connect_redis
         r = connect_redis()
-    payload = request_data.request_body or request_data.path
 
+    payload = request_data.request_body or request_data.path
     matched_existing_rule = None
-    if r:
+
+    if r and payload:
         try:
-            existing_rules = r.smembers("waf:rules:regex")
+            if r.sismember("waf:rules:exact_payloads", payload):
+                matched_existing_rule = "Exact Stage 1 Redis Fast-Path Rule"
         except Exception:
-            existing_rules = []
-        if existing_rules:
-            import re
-            for rule in existing_rules:
-                rule_str = rule.decode("utf-8") if isinstance(rule, bytes) else rule
-                rule_clean = rule_str.replace("(?i)", "").replace("\\", "")
-                if rule_clean and (payload.lower() in rule_clean.lower() or rule_clean.lower() in payload.lower()):
-                    matched_existing_rule = rule_str
-                    break
-                clean_p = re.sub(r'[\`\(\)\?\:\-\\\|\^\$\.\*]+', ' ', rule_str.replace("(?i)", "")).strip()
-                tokens = [t.lower() for t in clean_p.split() if len(t) >= 4 and t.lower() not in ["http", "query"]]
-                if tokens and any(t in payload.lower() for t in tokens):
-                    matched_existing_rule = rule_str
-                    break
+            pass
+
+        if not matched_existing_rule:
+            try:
+                existing_rules = r.smembers("waf:rules:regex")
+            except Exception:
+                existing_rules = []
+
+            if existing_rules:
+                for rule in existing_rules:
+                    rule_str = rule.decode("utf-8") if isinstance(rule, bytes) else rule
+                    rule_clean = rule_str.replace("(?i)", "").replace("\\", "")
+                    if rule_clean and (payload.lower() in rule_clean.lower() or rule_clean.lower() in payload.lower()):
+                        matched_existing_rule = rule_str
+                        break
+                    clean_p = re.sub(r'[\`\(\)\?\:\-\\\|\^\$\.\*]+', ' ', rule_str.replace("(?i)", "")).strip()
+                    tokens = [t.lower() for t in clean_p.split() if len(t) >= 4 and t.lower() not in ["http", "query"]]
+                    if tokens and any(t in payload.lower() for t in tokens):
+                        matched_existing_rule = rule_str
+                        break
 
     if matched_existing_rule:
         response = {
@@ -74,8 +80,10 @@ async def analyze(request_data: RequestData):
         response, new_rule = None, None
         if is_malicious:
             new_rule = generate_rule_from_payload(payload)
-            if new_rule and r:
-                r.sadd("waf:rules:regex", new_rule)
+            if r:
+                if new_rule:
+                    r.sadd("waf:rules:regex", new_rule)
+                r.sadd("waf:rules:exact_payloads", payload)
             response = {
                 "allow": False,
                 "stage1_fast_path": False,
@@ -85,39 +93,38 @@ async def analyze(request_data: RequestData):
         else:
             response = {"allow": True, "stage1_fast_path": False, "reason": "Passed transformer model analysis."}
 
-        collection = get_collection()
-        if collection is not None:
-            timestamp = datetime.utcnow()
-            doc = {
-                "timestamp": timestamp,
-                "request": request_data.model_dump(),
-                "analysis": {
-                    "is_malicious": is_malicious,
-                    "reconstruction_loss": rec_error,
-                    "perplexity": perplexity,
-                    "details": details,
-                },
-                "action_taken": "BLOCK" if is_malicious else "ALLOW",
-                "auto_learned_rule": new_rule,
-            }
-            result = collection.insert_one(doc)
-            doc["_id"] = str(result.inserted_id)
-            await manager.broadcast(
-                {
-                    "_id": doc["_id"],
-                    "timestamp": timestamp.isoformat(),
-                    "method": request_data.method,
-                    "path": request_data.path,
-                    "request_body": request_data.request_body,
-                    "action_taken": doc["action_taken"],
-                    "is_malicious": is_malicious,
-                    "reconstruction_loss": rec_error,
-                    "perplexity": perplexity,
-                    "auto_learned_rule": new_rule,
-                }
-            )
+    action_taken = "BLOCK" if is_malicious else "ALLOW"
+    timestamp = datetime.utcnow()
+    doc_id = f"log_{int(timestamp.timestamp() * 1000)}"
 
-        return response
+    collection = get_collection()
+    if collection is not None:
+        doc = {
+            "timestamp": timestamp,
+            "request": request_data.model_dump(),
+            "analysis": {
+                "is_malicious": is_malicious,
+                "reconstruction_loss": rec_error,
+                "perplexity": perplexity if 'perplexity' in locals() else 0.0,
+            },
+            "action_taken": action_taken,
+            "auto_learned_rule": new_rule,
+        }
+        result = collection.insert_one(doc)
+        doc_id = str(result.inserted_id)
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+    await manager.broadcast(
+        {
+            "_id": doc_id,
+            "timestamp": timestamp.isoformat(),
+            "method": request_data.method,
+            "path": request_data.path,
+            "request_body": request_data.request_body,
+            "action_taken": action_taken,
+            "is_malicious": is_malicious,
+            "reconstruction_loss": rec_error,
+            "auto_learned_rule": new_rule,
+        }
+    )
+
+    return response

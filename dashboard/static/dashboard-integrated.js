@@ -174,17 +174,23 @@ async loadHistoricalData() {
             tableBody.innerHTML = ''; // Clear table first
             
             response.logs.reverse().forEach(log => {
+                const reqObj = log.request || log;
+                const reqBody = (reqObj.request_body !== undefined) ? reqObj.request_body : (reqObj.body || '');
+                const reqPath = reqObj.path || reqObj.url || '/';
+                const isMalicious = log.analysis ? log.analysis.is_malicious : (log.is_malicious || false);
+                const recLoss = log.analysis ? log.analysis.reconstruction_loss : (log.reconstruction_loss || 0);
+
                 const event = {
                     id: log._id,
-                    timestamp: new Date(log.timestamp).toLocaleTimeString(),
-                    sourceIP: this.extractIP(log.request.request_body) || 'N/A',
-                    url: log.request.path,
-                    threatType: this.detectThreatType(log.request.request_body, log.request.path),
-                    threat: this.getThreatLabel(log.request.request_body, log.request.path),
-                    action: log.action_taken,
-                    severity: log.analysis.is_malicious ? 'high' : 'low',
+                    timestamp: log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString(),
+                    sourceIP: this.extractIP(reqBody) || '172.18.0.1',
+                    url: reqPath,
+                    threatType: this.detectThreatType(reqBody, reqPath),
+                    threat: this.getThreatLabel(reqBody, reqPath),
+                    action: log.action_taken || (isMalicious ? 'BLOCK' : 'ALLOW'),
+                    severity: isMalicious ? 'high' : 'low',
                     mongoId: log._id,
-                    reconstructionLoss: log.analysis.reconstruction_loss,
+                    reconstructionLoss: recLoss,
                     autoLearnedRule: log.auto_learned_rule
                 };
                 this.addEventToTable(event);
