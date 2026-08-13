@@ -233,3 +233,14 @@ class WAFDashboardAPI {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = WAFDashboardAPI;
 }
+
+async function setRateLimit(maxReqs) {
+    try {
+        const response = await fetch(`/set-ratelimit/${maxReqs}`, { method: 'POST' });
+        if (response.ok) {
+            alert(`Edge Rate Limit threshold updated to ${maxReqs} reqs / 10s!`);
+        }
+    } catch (err) {
+        console.error("Failed to update rate limit threshold:", err);
+    }
+}

@@ -22,6 +22,43 @@ if mode == "off" then
     return
 end
 
+-- IP Rate Limiting Engine
+local client_ip = ngx.var.http_x_forwarded_for or ngx.var.remote_addr or "127.0.0.1"
+if ok then
+    local rate_limit_max = 25
+    local custom_max = red:get("waf:config:ratelimit_max")
+    if custom_max and custom_max ~= ngx.null then
+        rate_limit_max = tonumber(custom_max) or 25
+    end
+
+    local rate_key = "waf:ratelimit:" .. client_ip
+    local current_count, incr_err = red:incr(rate_key)
+    if current_count == 1 then
+        red:expire(rate_key, 10)
+    end
+
+    if current_count and current_count > rate_limit_max then
+        ngx.log(ngx.WARN, "BLOCK: IP Rate Limit Exceeded for IP ", client_ip, ": ", current_count, " reqs")
+        ngx.header.content_type = "text/html"
+        ngx.header["Retry-After"] = "10"
+        ngx.status = 429
+        ngx.say([[
+            <!DOCTYPE html>
+            <html>
+            <head><title>429 Too Many Requests | WireFall WAF</title></head>
+            <body style="background:#030509; color:#f8fafc; font-family:sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; margin:0;">
+                <div style="background:#0c1220; border:1px solid #f97316; border-radius:16px; padding:2.5rem; text-align:center; max-width:520px; box-shadow:0 0 40px rgba(249,115,22,0.2);">
+                    <h2 style="color:#f97316; margin-top:0; font-size:1.5rem;">⏱️ 429 Too Many Requests</h2>
+                    <p style="color:#94a3b8; font-size:0.9rem;">Your IP address (<b>]] .. client_ip .. [[</b>) exceeded the maximum limit of <b>]] .. rate_limit_max .. [[ requests / 10s</b>.</p>
+                    <p style="color:#64748b; font-size:0.8rem;">WireFall Edge Rate Limiter active. Please pause requests for 10 seconds.</p>
+                </div>
+            </body>
+            </html>
+        ]])
+        return ngx.exit(429)
+    end
+end
+
 local request_body = ngx.req.get_body_data() or ""
 local uri_args = ngx.req.get_uri_args()
 local check_strings = {}

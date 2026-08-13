@@ -62,6 +62,15 @@
                 </div>
 
                 <div class="panel-section">
+                    <h3><i class="fas fa-gauge-high" style="color: var(--cf-orange);"></i> Edge Rate Limit Throttling</h3>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                        <button class="btn-sm-action" onclick="setRateLimit(10)">10 / 10s</button>
+                        <button class="btn-sm-action" onclick="setRateLimit(25)">25 / 10s</button>
+                        <button class="btn-sm-action" onclick="setRateLimit(50)">50 / 10s</button>
+                    </div>
+                </div>
+
+                <div class="panel-section">
                     <h3><i class="fas fa-chart-pie" style="color: var(--cf-teal);"></i> Real-Time Telemetry Counters</h3>
                     <div class="metric-card">
                         <div class="metric-icon benign">

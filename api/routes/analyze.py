@@ -140,3 +140,13 @@ async def analyze(request_data: RequestData):
     )
 
     return response
+
+
+@router.post("/set-ratelimit/{max_reqs}")
+async def set_ratelimit(max_reqs: int):
+    r = get_redis()
+    if r:
+        r.set("waf:config:ratelimit_max", str(max_reqs))
+        return {"status": "success", "ratelimit_max": max_reqs}
+    return {"status": "error", "message": "Redis unavailable"}
+
