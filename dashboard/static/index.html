@@ -15,13 +15,12 @@
                         brand: {
                             500: '#f97316',
                             600: '#ea580c',
-                             glow: 'rgba(249, 115, 22, 0.15)',
+                            glow: 'rgba(249, 115, 22, 0.2)',
                         },
                         cyber: {
                             dark: '#030509',
                             panel: 'rgba(10, 15, 26, 0.85)',
-                            card: '#0d1322',
-                            cardHover: '#131b2e',
+                            card: '#0c1220',
                             border: 'rgba(255, 255, 255, 0.08)',
                             teal: '#06b6d4',
                             green: '#10b981',
@@ -43,42 +42,55 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
         .cyber-grid {
-            background-size: 40px 40px;
+            background-size: 50px 50px;
             background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+                linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
         }
         .glass-card {
-            background: rgba(13, 19, 34, 0.8);
+            background: rgba(12, 18, 32, 0.85);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .glass-card:hover {
-            border-color: rgba(249, 115, 22, 0.4);
-            box-shadow: 0 0 30px rgba(249, 115, 22, 0.15);
+            border-color: rgba(249, 115, 22, 0.45);
+            box-shadow: 0 0 35px rgba(249, 115, 22, 0.2);
+            transform: translateY(-4px);
         }
-        .hero-glow-1 {
+        .hero-glow {
             position: absolute;
-            top: -10%;
+            top: -15%;
             left: 50%;
             transform: translateX(-50%);
-            width: 600px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(249, 115, 22, 0.2) 0%, rgba(6, 182, 212, 0.08) 50%, transparent 70%);
-            filter: blur(80px);
+            width: 800px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(249, 115, 22, 0.22) 0%, rgba(6, 182, 212, 0.1) 40%, transparent 70%);
+            filter: blur(100px);
             pointer-events: none;
+        }
+        #matrixCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1000px;
+            opacity: 0.12;
+            pointer-events: none;
+            z-index: 0;
         }
     </style>
 </head>
 <body class="min-h-screen cyber-grid antialiased selection:bg-brand-500 selection:text-white relative overflow-x-hidden">
 
-    <div class="hero-glow-1"></div>
+    <canvas id="matrixCanvas"></canvas>
+    <div class="hero-glow"></div>
 
     <!-- Header Navigation -->
     <header class="sticky top-0 z-50 glass-card border-b border-white/10 px-6 py-4 flex items-center justify-between">
         <div class="flex items-center gap-8">
             <a href="index.html" class="flex items-center gap-3 text-decoration-none">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/40">
                     <i class="fas fa-shield-halved text-xl"></i>
                 </div>
                 <div>
@@ -88,7 +100,7 @@
                 </div>
             </a>
 
-            <nav class="hidden md:flex items-center gap-2 bg-black/50 p-1.5 rounded-xl border border-white/10">
+            <nav class="hidden md:flex items-center gap-2 bg-black/60 p-1.5 rounded-xl border border-white/10">
                 <a href="index.html" class="px-4 py-2 rounded-lg text-xs font-bold bg-brand-500 text-white shadow-lg shadow-brand-500/30 flex items-center gap-2">
                     <i class="fas fa-rocket"></i> Home
                 </a>
@@ -111,11 +123,11 @@
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-6 py-16 space-y-28">
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-6 py-16 space-y-32 relative z-10">
         
         <!-- Hero Section -->
-        <div class="text-center space-y-8 max-w-4xl mx-auto pt-6">
+        <div class="text-center space-y-8 max-w-5xl mx-auto pt-4">
             <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-500 font-bold text-xs uppercase tracking-widest shadow-lg shadow-brand-500/10">
                 <span class="w-2 h-2 rounded-full bg-brand-500 animate-ping"></span> Enterprise Autonomous Edge Firewall
             </div>
@@ -185,7 +197,41 @@
             <div id="testOutput" class="hidden"></div>
         </div>
 
-        <!-- Vercel/Supabase-Style Bento Grid -->
+        <!-- 3-Stage Pipeline Flow Visualizer -->
+        <div class="glass-card rounded-3xl p-8 shadow-2xl space-y-6">
+            <div class="text-center space-y-2 max-w-xl mx-auto">
+                <span class="text-brand-500 font-bold text-xs uppercase tracking-widest">3-Stage Hybrid Security Architecture</span>
+                <h2 class="text-3xl font-black text-white">How WireFall Protects Traffic</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 pt-4 text-center">
+                <div class="p-6 rounded-2xl bg-cyber-card border border-white/10 space-y-3">
+                    <div class="w-10 h-10 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center font-mono font-bold text-sm mx-auto">01</div>
+                    <h4 class="font-bold text-white text-sm">OpenResty Ingress</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">Port 80 proxy intercepts HTTP/WS requests at cloud edge.</p>
+                </div>
+
+                <div class="p-6 rounded-2xl bg-cyber-card border border-emerald-500/30 space-y-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-mono font-bold text-sm mx-auto">02</div>
+                    <h4 class="font-bold text-white text-sm">Stage 1 Redis Fast-Path</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">O(1) memory set matching drops repeat attacks in &lt; 0.8ms.</p>
+                </div>
+
+                <div class="p-6 rounded-2xl bg-cyber-card border border-cyan-500/30 space-y-3">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-mono font-bold text-sm mx-auto">03</div>
+                    <h4 class="font-bold text-white text-sm">Stage 2 DistilBERT ML</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">Masked Language Model measures reconstruction loss for zero-days.</p>
+                </div>
+
+                <div class="p-6 rounded-2xl bg-cyber-card border border-purple-500/30 space-y-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-mono font-bold text-sm mx-auto">04</div>
+                    <h4 class="font-bold text-white text-sm">Qwen2.5 LLM Auto-Gen</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">Synthesizes regex rules dynamically and hot-reloads Redis sets.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bento Box Feature Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div class="glass-card p-8 rounded-3xl space-y-4">
                 <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-2xl">
@@ -218,7 +264,7 @@
             </div>
         </div>
 
-        <!-- SaaS Pricing Matrix -->
+        <!-- Enterprise Pricing Matrix -->
         <div class="space-y-10 text-center">
             <div class="space-y-3">
                 <span class="text-brand-500 font-bold text-xs uppercase tracking-widest">Flexible Cloud Plans</span>
@@ -238,7 +284,7 @@
                             <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Basic Telemetry Logs</li>
                         </ul>
                     </div>
-                    <a href="dashboard.html" class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs text-center transition-all">Get Started Free</a>
+                    <a href="dashboard.html" class="w-full py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs text-center transition-all">Get Started Free</a>
                 </div>
 
                 <!-- Business Pro Plan -->
@@ -270,19 +316,45 @@
                             <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Dedicated SOC Support Analyst</li>
                         </ul>
                     </div>
-                    <a href="dashboard.html" class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs text-center transition-all">Contact Enterprise Sales</a>
+                    <a href="dashboard.html" class="w-full py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs text-center transition-all">Contact Enterprise Sales</a>
                 </div>
             </div>
         </div>
 
     </main>
 
-    <footer class="border-t border-white/10 py-10 text-center text-xs text-slate-500">
+    <footer class="border-t border-white/10 py-10 text-center text-xs text-slate-500 relative z-10">
         WireFall AI WAF &copy; 2026. Microservice architecture deployed on Azure VM (20.196.201.53).
     </footer>
 
     <script>
         const API_BASE = window.location.origin;
+
+        // Matrix rain effect
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = 1000;
+        const katakana = '0123456789ABCDEF01';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const rainDrops = Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(3, 5, 9, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#f97316';
+            ctx.font = fontSize + 'px monospace';
+            for (let i = 0; i < rainDrops.length; i++) {
+                const text = katakana.charAt(Math.floor(Math.random() * katakana.length));
+                ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+                if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    rainDrops[i] = 0;
+                }
+                rainDrops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 50);
 
         async function testPayload(payload, name) {
             const out = document.getElementById("testOutput");
