@@ -115,7 +115,7 @@ local transformer_data = {
     request_body = request_body_str
 }
 
-local res = ngx.location.capture("/analyze", {
+local res = ngx.location.capture("/analyze_internal", {
     method = ngx.HTTP_POST,
     body = cjson.encode(transformer_data)
 })
