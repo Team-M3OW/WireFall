@@ -23,7 +23,10 @@ if mode == "off" then
 end
 
 -- IP Rate Limiting Engine
-local client_ip = ngx.var.http_x_forwarded_for or ngx.var.remote_addr or "127.0.0.1"
+local client_ip = ngx.var.remote_addr or "127.0.0.1"
+if ngx.var.http_x_forwarded_for then
+    client_ip = string.match(ngx.var.http_x_forwarded_for, "[%d%.]+") or client_ip
+end
 if ok then
     local rate_limit_max = 25
     local custom_max = red:get("waf:config:ratelimit_max")
