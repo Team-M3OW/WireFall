@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WireFall | Cloudflare Radar WAF Intelligence</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="styles.css">
@@ -14,11 +14,13 @@
         <!-- Cloudflare Radar Style Header -->
         <header class="dashboard-header">
             <div class="header-left">
-                <h1 class="dashboard-title">
-                    <i class="fas fa-shield-halved"></i>
-                    WireFall Cloud
+                <a href="index.html" class="dashboard-title">
+                    <div class="title-icon-wrapper">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+                    <span>WireFall Cloud</span>
                     <span class="radar-badge">Radar WAF Live</span>
-                </h1>
+                </a>
                 <div class="system-status">
                     <div class="status-indicator" id="mlStatus">
                         <div class="status-dot ml" id="mlStatusDot"></div>
@@ -27,15 +29,15 @@
                 </div>
             </div>
             <div class="header-right">
-                <a href="index.html" class="nav-link active"><i class="fas fa-chart-line"></i> Dashboard</a>
+                <a href="index.html" class="nav-link active"><i class="fas fa-chart-line"></i> Radar Telemetry</a>
                 <a href="hacker.html" class="nav-link"><i class="fas fa-terminal"></i> Hacker Sandbox</a>
-                <a href="/app/" class="nav-link"><i class="fas fa-shopping-cart"></i> Sample App</a>
-                <button class="nav-link" id="simToggleBtn" onclick="dashboard.toggleSimulation()" style="border: 1px solid var(--cf-orange); color: var(--cf-orange); cursor: pointer; background: var(--cf-orange-glow); font-weight: 700;"><i class="fas fa-play"></i> Start Traffic Simulator</button>
+                <a href="/app/" class="nav-link"><i class="fas fa-store"></i> Apex Tech Store</a>
+                <button class="nav-link btn-sim-toggle" id="simToggleBtn" onclick="dashboard.toggleSimulation()"><i class="fas fa-play"></i> Start Traffic Simulator</button>
                 <div class="status-indicator" style="margin-left: 0.5rem;">
                     <i class="fas fa-clock" style="color: var(--cf-orange);"></i>
-                    <span id="lastUpdated" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">Last Updated: --:--:--</span>
+                    <span id="lastUpdated" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">--:--:--</span>
                 </div>
-                <button class="nav-link" id="refreshBtn" style="border: 1px solid var(--panel-border); cursor: pointer;">
+                <button class="nav-link" id="refreshBtn" title="Refresh Feed">
                     <i class="fas fa-sync-alt"></i>
                 </button>
             </div>
@@ -45,17 +47,17 @@
             <!-- Sidebar Controls -->
             <aside class="control-panel">
                 <div class="panel-section">
-                    <h3>WAF Execution Profile</h3>
+                    <h3><i class="fas fa-sliders" style="color: var(--cf-orange);"></i> WAF Execution Profile</h3>
                     <div class="toggle-group" id="wafModeToggle">
-                        <div class="toggle-option active" data-mode="fast">
-                            <div class="toggle-ring"></div>
-                            <i class="fas fa-bolt" style="color: var(--cf-orange);"></i>
-                            <span>Transformer Only</span>
-                        </div>
-                        <div class="toggle-option" data-mode="full">
+                        <div class="toggle-option active" data-mode="full">
                             <div class="toggle-ring"></div>
                             <i class="fas fa-shield-cat" style="color: var(--cf-teal);"></i>
                             <span>Full Hybrid WAF</span>
+                        </div>
+                        <div class="toggle-option" data-mode="fast">
+                            <div class="toggle-ring"></div>
+                            <i class="fas fa-bolt" style="color: var(--cf-orange);"></i>
+                            <span>Transformer Only</span>
                         </div>
                         <div class="toggle-option" data-mode="off">
                             <div class="toggle-ring"></div>
@@ -66,7 +68,7 @@
                 </div>
 
                 <div class="panel-section">
-                    <h3>Real-Time Traffic Counters</h3>
+                    <h3><i class="fas fa-chart-pie" style="color: var(--cf-teal);"></i> Traffic Telemetry Counters</h3>
                     <div class="metric-card">
                         <div class="metric-icon benign">
                             <i class="fas fa-shield-check"></i>
@@ -97,24 +99,24 @@
                 </div>
 
                 <div class="panel-section">
-                    <h3>Node Resource Metrics</h3>
-                    <div class="health-indicators" style="display: flex; flex-direction: column; gap: 0.85rem;">
-                        <div>
-                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem;">
-                                <span>CPU Usage</span>
-                                <span style="font-family: var(--font-mono);">Standard_B2s_v2</span>
+                    <h3><i class="fas fa-microchip" style="color: var(--cf-purple);"></i> Cloud Node Telemetry</h3>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div class="resource-bar-wrapper">
+                            <div class="resource-bar-header">
+                                <span>Azure VM CPU (B2s_v2)</span>
+                                <span style="font-family: var(--font-mono); font-weight: 700; color: var(--cf-orange);">38%</span>
                             </div>
-                            <div style="height: 6px; background: var(--panel-card); border-radius: 3px; overflow: hidden;">
-                                <div id="cpuUsage" style="width: 45%; height: 100%; background: var(--cf-orange); transition: width 0.5s;"></div>
+                            <div class="resource-bar-track">
+                                <div class="resource-bar-fill" style="width: 38%; background: linear-gradient(90deg, var(--cf-orange), #ea580c);"></div>
                             </div>
                         </div>
-                        <div>
-                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem;">
-                                <span>RAM Allocated</span>
-                                <span style="font-family: var(--font-mono);">3.8 GB / 4.0 GB</span>
+                        <div class="resource-bar-wrapper">
+                            <div class="resource-bar-header">
+                                <span>RAM Allocation</span>
+                                <span style="font-family: var(--font-mono); font-weight: 700; color: var(--cf-teal);">3.8 GB / 4.0 GB</span>
                             </div>
-                            <div style="height: 6px; background: var(--panel-card); border-radius: 3px; overflow: hidden;">
-                                <div id="memoryUsage" style="width: 62%; height: 100%; background: var(--cf-teal); transition: width 0.5s;"></div>
+                            <div class="resource-bar-track">
+                                <div class="resource-bar-fill" style="width: 78%; background: linear-gradient(90deg, var(--cf-teal), #0284c7);"></div>
                             </div>
                         </div>
                     </div>
@@ -128,9 +130,9 @@
                     <div class="graph-header">
                         <h2><i class="fas fa-chart-area" style="color: var(--cf-orange);"></i> Live Radar Telemetry Stream</h2>
                         <div style="display: flex; gap: 0.5rem;">
-                            <button class="nav-link active" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">5M</button>
-                            <button class="nav-link" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">15M</button>
-                            <button class="nav-link" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">1H</button>
+                            <button class="nav-link active" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;">LIVE</button>
+                            <button class="nav-link" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;">5M</button>
+                            <button class="nav-link" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;">15M</button>
                         </div>
                     </div>
 
@@ -145,7 +147,7 @@
                         <h2><i class="fas fa-list-ol" style="color: var(--cf-orange);"></i> Threat Detection Log Feed</h2>
                     </div>
 
-                    <div style="overflow-x: auto;">
+                    <div class="events-table-wrapper">
                         <table class="events-table">
                             <thead>
                                 <tr>
