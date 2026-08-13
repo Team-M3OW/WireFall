@@ -80,7 +80,7 @@ async def analyze(request_data: RequestData):
     else:
         formatted_log = build_sequence(request_data.model_dump())
         rec_error, cls_emb, perplexity = extract_features(formatted_log)
-        category, details = predict_anomaly(rec_error, cls_emb, perplexity)
+        category, details = predict_anomaly(rec_error, cls_emb, perplexity, payload=payload)
         is_malicious = bool(category)
 
         response, new_rule = None, None
