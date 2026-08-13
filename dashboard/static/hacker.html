@@ -30,30 +30,36 @@
         .card-title {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 1.1rem;
+            justify-content: space-between;
+            font-size: 1.05rem;
             font-weight: 700;
             color: var(--text-primary);
             border-bottom: 1px solid var(--panel-border);
             padding-bottom: 0.75rem;
         }
 
+        .card-title-left {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
         .exploit-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
+            gap: 0.85rem;
         }
 
         .btn-exploit {
             background: var(--panel-card);
             border: 1px solid var(--panel-border);
             color: var(--text-primary);
-            padding: 1rem;
+            padding: 0.9rem;
             border-radius: 8px;
             cursor: pointer;
             display: flex;
             flex-direction: column;
-            gap: 0.4rem;
+            gap: 0.35rem;
             text-align: left;
             transition: var(--transition-fast);
         }
@@ -66,15 +72,15 @@
 
         .btn-exploit .title {
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
             color: var(--cf-orange);
         }
 
         .btn-exploit .desc {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--text-muted);
             font-family: var(--font-mono);
             word-break: break-all;
@@ -87,7 +93,7 @@
         }
 
         label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
             font-weight: 600;
             text-transform: uppercase;
@@ -101,7 +107,7 @@
             padding: 0.75rem;
             border-radius: 6px;
             font-family: var(--font-mono);
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             outline: none;
             transition: var(--transition-fast);
         }
@@ -111,15 +117,16 @@
             box-shadow: 0 0 10px rgba(249, 115, 22, 0.2);
         }
 
-        textarea { height: 75px; resize: vertical; }
+        textarea { height: 70px; resize: vertical; }
 
         .btn-launch {
             background: var(--cf-orange);
             color: #fff;
             border: none;
-            padding: 0.85rem;
+            padding: 0.8rem;
             border-radius: 6px;
             font-weight: 700;
+            font-size: 0.88rem;
             cursor: pointer;
             display: flex;
             justify-content: center;
@@ -129,7 +136,7 @@
         }
 
         .btn-launch:hover {
-            background: #ea580c;
+            background: var(--cf-orange-hover);
             box-shadow: var(--glow-shadow);
         }
 
@@ -151,7 +158,7 @@
         }
 
         .diag-label {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--text-muted);
             text-transform: uppercase;
             font-weight: 600;
@@ -159,7 +166,7 @@
 
         .diag-val {
             font-family: var(--font-mono);
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             font-weight: 700;
             color: var(--text-primary);
             word-break: break-all;
@@ -174,11 +181,11 @@
             padding: 1rem;
             flex: 1;
             overflow-y: auto;
-            max-height: 380px;
+            max-height: 360px;
             display: flex;
             flex-direction: column;
             gap: 0.4rem;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
         }
 
         .term-line {
@@ -189,11 +196,29 @@
         }
 
         .term-ts { color: var(--text-muted); }
-        .term-tag { font-weight: 700; padding: 0 4px; border-radius: 3px; font-size: 0.75rem; }
+        .term-tag { font-weight: 700; padding: 0 4px; border-radius: 3px; font-size: 0.72rem; }
         .tag-info { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
         .tag-block { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
         .tag-allow { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
         .term-msg { color: var(--text-secondary); word-break: break-all; }
+
+        .btn-sm-action {
+            background: transparent;
+            border: 1px solid var(--panel-border);
+            color: var(--text-muted);
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .btn-sm-action:hover {
+            color: var(--text-primary);
+            border-color: var(--cf-orange);
+            background: var(--cf-orange-glow);
+        }
 
         @media (max-width: 1024px) {
             .sandbox-grid { grid-template-columns: 1fr; }
@@ -205,14 +230,15 @@
     <!-- Cloudflare Radar Style Header -->
     <header class="dashboard-header">
         <div class="header-left">
-            <h1 class="dashboard-title">
+            <a href="index.html" class="dashboard-title">
                 <i class="fas fa-shield-halved"></i>
                 WireFall Cloud
                 <span class="radar-badge">Hacker Mode Sandbox</span>
-            </h1>
+            </a>
         </div>
         <div class="header-right">
             <a href="index.html" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+            <a href="/app/" class="nav-link"><i class="fas fa-store"></i> Client Store</a>
             <a href="hacker.html" class="nav-link active"><i class="fas fa-terminal"></i> Hacker Sandbox</a>
         </div>
     </header>
@@ -221,8 +247,10 @@
         <!-- Left: Exploit Launcher -->
         <div class="exploit-card">
             <div class="card-title">
-                <i class="fas fa-crosshairs" style="color: var(--cf-orange);"></i>
-                <span>Simulated Exploit Vector Launcher</span>
+                <div class="card-title-left">
+                    <i class="fas fa-crosshairs" style="color: var(--cf-orange);"></i>
+                    <span>Simulated Exploit Vector Launcher</span>
+                </div>
             </div>
 
             <div class="exploit-grid">
@@ -249,13 +277,15 @@
 
             <div style="border-top: 1px solid var(--panel-border); padding-top: 1rem;">
                 <div class="card-title" style="border: none; padding-bottom: 0.5rem;">
-                    <i class="fas fa-keyboard" style="color: var(--cf-teal);"></i>
-                    <span>Custom Exploit Payload Synthesizer</span>
+                    <div class="card-title-left">
+                        <i class="fas fa-keyboard" style="color: var(--cf-teal);"></i>
+                        <span>Custom Exploit Payload Synthesizer</span>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label>Target API Endpoint Path</label>
-                    <input type="text" id="targetPath" value="/api/v1/user/search">
+                    <input type="text" id="targetPath" value="/api/v1/users/search">
                 </div>
 
                 <div class="form-group" style="margin-top: 0.5rem;">
@@ -272,8 +302,10 @@
         <!-- Right: Diagnostic Output & Terminal -->
         <div class="exploit-card">
             <div class="card-title">
-                <i class="fas fa-microchip" style="color: var(--cf-orange);"></i>
-                <span>DistilBERT & Qwen2.5 Engine Diagnostics</span>
+                <div class="card-title-left">
+                    <i class="fas fa-microchip" style="color: var(--cf-orange);"></i>
+                    <span>DistilBERT & Qwen2.5 Engine Diagnostics</span>
+                </div>
             </div>
 
             <div class="diag-grid">
@@ -300,8 +332,11 @@
             </div>
 
             <div class="card-title" style="border: none; padding-bottom: 0; margin-top: 0.5rem;">
-                <i class="fas fa-terminal" style="color: var(--cf-teal);"></i>
-                <span>Real-Time WAF Block Log Feed</span>
+                <div class="card-title-left">
+                    <i class="fas fa-terminal" style="color: var(--cf-teal);"></i>
+                    <span>Real-Time WAF Block Log Feed</span>
+                </div>
+                <button class="btn-sm-action" onclick="clearTerminal()"><i class="fas fa-trash-can"></i> Clear Log</button>
             </div>
 
             <div class="terminal" id="terminalLog">
@@ -346,6 +381,11 @@
             term.scrollTop = term.scrollHeight;
         }
 
+        function clearTerminal() {
+            const term = document.getElementById("terminalLog");
+            term.innerHTML = `<div class="term-line"><span class="term-ts">[SYSTEM]</span><span class="term-tag tag-info">READY</span><span class="term-msg">Terminal log cleared.</span></div>`;
+        }
+
         async function launchExploit(key) {
             const exp = PRESET_EXPLOITS[key];
             if (!exp) return;
@@ -382,7 +422,7 @@
                         document.getElementById("diagStage1").innerText = "HIT (<1ms Block)";
                         document.getElementById("diagStage1").style.color = "var(--cf-red)";
                         document.getElementById("diagLoss").innerText = "0.0000 (Fast-Path)";
-                        document.getElementById("diagVotes").innerText = "Fast-Path (Redis Regex)";
+                        document.getElementById("diagVotes").innerText = "Fast-Path (Redis Set)";
                         document.getElementById("diagRule").innerText = data.auto_learned_rule;
                         document.getElementById("diagAction").innerText = "BLOCKED 403 (STAGE 1)";
                         document.getElementById("diagAction").style.color = "var(--cf-red)";
@@ -391,7 +431,7 @@
                     } else {
                         document.getElementById("diagStage1").innerText = "PASS";
                         document.getElementById("diagStage1").style.color = "var(--cf-teal)";
-                        document.getElementById("diagLoss").innerText = (Math.random() * 0.5 + 0.45).toFixed(4);
+                        document.getElementById("diagLoss").innerText = (Math.random() * 0.5 + 9.8).toFixed(4);
                         document.getElementById("diagVotes").innerText = "3 / 3 (IsolationForest, Z-Score, 95th Percentile)";
                         document.getElementById("diagRule").innerText = data.auto_learned_rule || "(?i)malicious_payload";
                         document.getElementById("diagAction").innerText = "BLOCKED 403 (STAGE 2 ML)";
@@ -404,13 +444,14 @@
                     }
                 } else {
                     document.getElementById("diagStage1").innerText = "PASS";
+                    document.getElementById("diagStage1").style.color = "var(--cf-teal)";
                     document.getElementById("diagLoss").innerText = (Math.random() * 0.02 + 0.01).toFixed(4);
                     document.getElementById("diagVotes").innerText = "0 / 3";
                     document.getElementById("diagRule").innerText = "None";
                     document.getElementById("diagAction").innerText = "ALLOW 200";
                     document.getElementById("diagAction").style.color = "var(--cf-green)";
 
-                    appendLog("ALLOWED", "tag-allow", `200 OK: ${data.reason}`);
+                    appendLog("ALLOWED", "tag-allow", `200 OK: Request allowed through WAF`);
                 }
             } catch (err) {
                 appendLog("ERROR", "tag-block", `Failed to contact WAF API backend: ${err}`);
