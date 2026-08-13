@@ -36,12 +36,13 @@ if ok then
 
     local rate_key = "waf:ratelimit:" .. client_ip
     local current_count, incr_err = red:incr(rate_key)
-    if current_count == 1 then
+    local count_num = tonumber(current_count) or 0
+    if count_num == 1 then
         red:expire(rate_key, 10)
     end
 
-    if current_count and current_count > rate_limit_max then
-        ngx.log(ngx.WARN, "BLOCK: IP Rate Limit Exceeded for IP ", client_ip, ": ", current_count, " reqs")
+    if count_num > rate_limit_max then
+        ngx.log(ngx.WARN, "BLOCK: IP Rate Limit Exceeded for IP ", client_ip, ": ", count_num, " reqs")
         ngx.header.content_type = "text/html"
         ngx.header["Retry-After"] = "10"
         ngx.status = 429
