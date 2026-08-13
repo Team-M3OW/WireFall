@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WireFall | SOC Radar Telemetry Console</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <a href="index.html" class="dashboard-title">
+                    <div class="title-icon-wrapper">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+                    <span>WireFall Cloud</span>
+                    <span class="radar-badge">SOC Radar Live</span>
+                </a>
+                <div class="system-status">
+                    <div class="status-indicator" id="mlStatus">
+                        <div class="status-dot ml" id="mlStatusDot"></div>
+                        <span>DistilBERT MLM & Qwen2.5 Engine</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <a href="index.html" class="nav-link"><i class="fas fa-rocket"></i> Home</a>
+                <a href="dashboard.html" class="nav-link active"><i class="fas fa-chart-line"></i> SOC Radar Console</a>
+                <a href="hacker.html" class="nav-link"><i class="fas fa-terminal"></i> Exploit Workstation</a>
+                <a href="/app/" class="nav-link"><i class="fas fa-store"></i> Demo App</a>
+                <button class="nav-link btn-sim-toggle" id="simToggleBtn" onclick="dashboard.toggleSimulation()"><i class="fas fa-play"></i> Start Traffic Simulator</button>
+            </div>
+        </header>
+
+        <div class="dashboard-body">
+            <!-- Sidebar Controls -->
+            <aside class="control-panel">
+                <div class="panel-section">
+                    <h3><i class="fas fa-sliders" style="color: var(--cf-orange);"></i> WAF Execution Profile</h3>
+                    <div class="toggle-group" id="wafModeToggle">
+                        <div class="toggle-option active" data-mode="full">
+                            <div class="toggle-ring"></div>
+                            <i class="fas fa-shield-cat" style="color: var(--cf-teal);"></i>
+                            <span>Full Hybrid WAF</span>
+                        </div>
+                        <div class="toggle-option" data-mode="fast">
+                            <div class="toggle-ring"></div>
+                            <i class="fas fa-bolt" style="color: var(--cf-orange);"></i>
+                            <span>Transformer Only</span>
+                        </div>
+                        <div class="toggle-option" data-mode="off">
+                            <div class="toggle-ring"></div>
+                            <i class="fas fa-power-off" style="color: var(--cf-red);"></i>
+                            <span>Bypass / Pass-Through</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3><i class="fas fa-chart-pie" style="color: var(--cf-teal);"></i> Real-Time Telemetry Counters</h3>
+                    <div class="metric-card">
+                        <div class="metric-icon benign">
+                            <i class="fas fa-shield-check"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value" id="benignCount" style="color: var(--cf-green);">0</div>
+                            <div class="metric-label">Benign Requests</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon malicious">
+                            <i class="fas fa-bug"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value" id="maliciousCount" style="color: var(--cf-red);">0</div>
+                            <div class="metric-label">Malicious Threats</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon total">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value" id="totalCount" style="color: var(--cf-blue);">0</div>
+                            <div class="metric-label">Total Analyzed</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3><i class="fas fa-microchip" style="color: var(--cf-purple);"></i> Cloud Node Telemetry</h3>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div class="resource-bar-wrapper">
+                            <div class="resource-bar-header">
+                                <span>Azure VM CPU (B2s_v2)</span>
+                                <span style="font-family: var(--font-mono); font-weight: 700; color: var(--cf-orange);">38%</span>
+                            </div>
+                            <div class="resource-bar-track">
+                                <div class="resource-bar-fill" style="width: 38%; background: linear-gradient(90deg, var(--cf-orange), #ea580c);"></div>
+                            </div>
+                        </div>
+                        <div class="resource-bar-wrapper">
+                            <div class="resource-bar-header">
+                                <span>RAM Allocation</span>
+                                <span style="font-family: var(--font-mono); font-weight: 700; color: var(--cf-teal);">3.8 GB / 4.0 GB</span>
+                            </div>
+                            <div class="resource-bar-track">
+                                <div class="resource-bar-fill" style="width: 78%; background: linear-gradient(90deg, var(--cf-teal), #0284c7);"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="main-content">
+                <!-- Live Telemetry Graph -->
+                <section class="graph-section">
+                    <div class="graph-header">
+                        <h2><i class="fas fa-chart-area" style="color: var(--cf-orange);"></i> Live Radar Telemetry Stream</h2>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="nav-link active" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;">LIVE</button>
+                            <button class="nav-link" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;">5M</button>
+                        </div>
+                    </div>
+
+                    <div class="ecg-chart-container">
+                        <canvas id="ecgChart"></canvas>
+                    </div>
+                </section>
+
+                <!-- Threat Detection Logs -->
+                <section class="table-section">
+                    <div class="table-header">
+                        <h2><i class="fas fa-list-ol" style="color: var(--cf-orange);"></i> Threat Detection Log Feed</h2>
+                    </div>
+
+                    <div class="events-table-wrapper">
+                        <table class="events-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Source IP</th>
+                                    <th>Path</th>
+                                    <th>Threat Category</th>
+                                    <th>WAF Action</th>
+                                    <th>Controls</th>
+                                </tr>
+                            </thead>
+                            <tbody id="eventsTableBody">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Hidden Log Container for JS compatibility -->
+    <div id="logViewer" style="display: none;">
+        <div id="logToggle"></div>
+        <div id="logContent"></div>
+    </div>
+
+    <script src="dashboard-api.js"></script>
+    <script src="dashboard-integrated.js"></script>
+</body>
+</html>
