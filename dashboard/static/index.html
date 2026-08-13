@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WireFall AI | Next-Gen Autonomous Edge WAF & Threat Defense</title>
+    <title>WireFall AI | Next-Gen Edge WAF & Autonomous Threat Mitigation</title>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,14 +15,17 @@
                         brand: {
                             500: '#f97316',
                             600: '#ea580c',
+                             glow: 'rgba(249, 115, 22, 0.15)',
                         },
                         cyber: {
-                            dark: '#05070c',
-                            panel: 'rgba(11, 16, 26, 0.85)',
-                            card: '#111827',
+                            dark: '#030509',
+                            panel: 'rgba(10, 15, 26, 0.85)',
+                            card: '#0d1322',
+                            cardHover: '#131b2e',
                             border: 'rgba(255, 255, 255, 0.08)',
                             teal: '#06b6d4',
                             green: '#10b981',
+                            purple: '#a855f7',
                         }
                     },
                     fontFamily: {
@@ -35,31 +38,44 @@
     </script>
     <style>
         body {
-            background-color: #05070c;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(249, 115, 22, 0.06) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.06) 0px, transparent 50%);
-            background-attachment: fixed;
+            background-color: #030509;
             color: #f8fafc;
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
-        .glass-panel {
-            background: rgba(11, 16, 26, 0.85);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
         .cyber-grid {
-            background-size: 30px 30px;
+            background-size: 40px 40px;
             background-image: 
                 linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
                 linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
         }
+        .glass-card {
+            background: rgba(13, 19, 34, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card:hover {
+            border-color: rgba(249, 115, 22, 0.4);
+            box-shadow: 0 0 30px rgba(249, 115, 22, 0.15);
+        }
+        .hero-glow-1 {
+            position: absolute;
+            top: -10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(249, 115, 22, 0.2) 0%, rgba(6, 182, 212, 0.08) 50%, transparent 70%);
+            filter: blur(80px);
+            pointer-events: none;
+        }
     </style>
 </head>
-<body class="min-h-screen cyber-grid antialiased selection:bg-brand-500 selection:text-white">
+<body class="min-h-screen cyber-grid antialiased selection:bg-brand-500 selection:text-white relative overflow-x-hidden">
+
+    <div class="hero-glow-1"></div>
 
     <!-- Header Navigation -->
-    <header class="sticky top-0 z-50 glass-panel border-b border-white/10 px-6 py-4 flex items-center justify-between">
+    <header class="sticky top-0 z-50 glass-card border-b border-white/10 px-6 py-4 flex items-center justify-between">
         <div class="flex items-center gap-8">
             <a href="index.html" class="flex items-center gap-3 text-decoration-none">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
@@ -67,12 +83,12 @@
                 </div>
                 <div>
                     <div class="font-extrabold text-xl tracking-tight text-white flex items-center gap-2">
-                        WireFall <span class="text-brand-500 text-xs px-2 py-0.5 rounded-full bg-brand-500/10 border border-brand-500/30 uppercase font-bold tracking-widest">AI WAF</span>
+                        WireFall <span class="text-brand-500 text-[10px] px-2 py-0.5 rounded-full bg-brand-500/10 border border-brand-500/30 uppercase font-extrabold tracking-widest">AI WAF</span>
                     </div>
                 </div>
             </a>
 
-            <nav class="hidden md:flex items-center gap-2 bg-black/40 p-1.5 rounded-xl border border-white/10">
+            <nav class="hidden md:flex items-center gap-2 bg-black/50 p-1.5 rounded-xl border border-white/10">
                 <a href="index.html" class="px-4 py-2 rounded-lg text-xs font-bold bg-brand-500 text-white shadow-lg shadow-brand-500/30 flex items-center gap-2">
                     <i class="fas fa-rocket"></i> Home
                 </a>
@@ -90,48 +106,48 @@
 
         <div class="flex items-center gap-3">
             <a href="dashboard.html" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-500 to-amber-500 hover:from-brand-600 hover:to-amber-600 text-white text-xs font-extrabold shadow-lg shadow-brand-500/30 transition-all hover:scale-105 flex items-center gap-2">
-                <i class="fas fa-chart-line"></i> Open SOC Console
+                <i class="fas fa-chart-line"></i> Launch SOC Console
             </a>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-6 py-16 space-y-24">
+    <main class="max-w-7xl mx-auto px-6 py-16 space-y-28">
         
         <!-- Hero Section -->
-        <div class="text-center space-y-8 max-w-4xl mx-auto">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-500 font-bold text-xs uppercase tracking-widest">
-                <span class="w-2 h-2 rounded-full bg-brand-500 animate-ping"></span> Next-Gen Autonomous Cloud WAF
+        <div class="text-center space-y-8 max-w-4xl mx-auto pt-6">
+            <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-500 font-bold text-xs uppercase tracking-widest shadow-lg shadow-brand-500/10">
+                <span class="w-2 h-2 rounded-full bg-brand-500 animate-ping"></span> Enterprise Autonomous Edge Firewall
             </div>
 
-            <h1 class="text-5xl md:text-7xl font-black tracking-tight leading-tight text-white">
-                Sub-Millisecond Threat Defense Powered by <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 via-amber-400 to-cyber-teal">Hybrid AI</span>
+            <h1 class="text-6xl md:text-8xl font-black tracking-tight leading-none text-white">
+                Sub-Millisecond Edge Security Powered by <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 via-amber-400 to-cyan-400">Hybrid AI & LLMs</span>
             </h1>
 
             <p class="text-lg md:text-xl text-slate-400 font-medium leading-relaxed max-w-3xl mx-auto">
-                Stop zero-day SQLi, XSS, and RCE attacks at the cloud edge. Stage 1 Redis Fast-Path matches payloads in <span class="text-emerald-400 font-bold font-mono">&lt; 1ms</span> while Stage 2 DistilBERT MLM & Qwen2.5 LLM synthesize security rules autonomously.
+                Protect web applications against zero-day SQLi, XSS, and RCE attacks. Stage 1 Redis Fast-Path matches attack payloads in <span class="text-emerald-400 font-bold font-mono">&lt; 0.8ms</span> while DistilBERT & Qwen2.5 LLM synthesize security rules autonomously.
             </p>
 
             <div class="flex flex-wrap items-center justify-center gap-4 pt-4">
                 <a href="dashboard.html" class="px-8 py-4 rounded-2xl bg-gradient-to-r from-brand-500 to-amber-500 hover:from-brand-600 hover:to-amber-600 text-white font-extrabold text-sm shadow-xl shadow-brand-500/30 transition-all hover:scale-105 flex items-center gap-3">
-                    <i class="fas fa-chart-line text-base"></i> Launch Radar Console
+                    <i class="fas fa-chart-line text-base"></i> Open SOC Console
                 </a>
                 <a href="hacker.html" class="px-8 py-4 rounded-2xl bg-cyber-card hover:bg-white/5 border border-white/10 text-white font-extrabold text-sm transition-all hover:scale-105 flex items-center gap-3">
-                    <i class="fas fa-vial text-base text-brand-500"></i> Open Exploit Workstation
+                    <i class="fas fa-flask text-base text-brand-500"></i> Open Exploit Lab
                 </a>
             </div>
         </div>
 
         <!-- Live Interception Interactive Tester -->
-        <div class="glass-panel rounded-3xl p-8 shadow-2xl space-y-6">
+        <div class="glass-card rounded-3xl p-8 shadow-2xl space-y-6">
             <div class="flex items-center justify-between border-b border-white/10 pb-6">
                 <div>
-                    <h3 class="text-xl font-extrabold text-white flex items-center gap-3">
+                    <h3 class="text-2xl font-black text-white flex items-center gap-3">
                         <i class="fas fa-bolt text-brand-500"></i> Live Attack Interception Test Station
                     </h3>
                     <p class="text-xs text-slate-400 mt-1">Test live exploit payloads directly against the active Azure WAF API backend</p>
                 </div>
-                <span class="px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-2 font-mono">
+                <span class="px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-2 font-mono">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Azure VM (20.196.201.53) ONLINE
                 </span>
             </div>
@@ -169,36 +185,93 @@
             <div id="testOutput" class="hidden"></div>
         </div>
 
-        <!-- 3-Stage Architecture Grid -->
+        <!-- Vercel/Supabase-Style Bento Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="glass-panel p-8 rounded-3xl space-y-4 hover:border-brand-500/40 transition-all">
-                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xl">
+            <div class="glass-card p-8 rounded-3xl space-y-4">
+                <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-2xl">
                     <i class="fas fa-bolt"></i>
                 </div>
-                <h3 class="text-xl font-bold text-white">Stage 1 O(1) Redis Fast-Path</h3>
+                <h3 class="text-xl font-extrabold text-white">Stage 1 O(1) Redis Fast-Path</h3>
                 <p class="text-sm text-slate-400 leading-relaxed">
                     Evaluates active regex signatures and O(1) exact payload hashes in Redis memory sets, dropping repeat attacks in <span class="text-emerald-400 font-bold font-mono">&lt; 0.8ms</span>.
                 </p>
             </div>
 
-            <div class="glass-panel p-8 rounded-3xl space-y-4 hover:border-brand-500/40 transition-all">
-                <div class="w-12 h-12 rounded-2xl bg-brand-500/10 border border-brand-500/30 text-brand-500 flex items-center justify-center text-xl">
+            <div class="glass-card p-8 rounded-3xl space-y-4">
+                <div class="w-14 h-14 rounded-2xl bg-brand-500/10 border border-brand-500/30 text-brand-500 flex items-center justify-center text-2xl">
                     <i class="fas fa-brain"></i>
                 </div>
-                <h3 class="text-xl font-bold text-white">Stage 2 DistilBERT Anomaly Engine</h3>
+                <h3 class="text-xl font-extrabold text-white">Stage 2 DistilBERT Anomaly Engine</h3>
                 <p class="text-sm text-slate-400 leading-relaxed">
                     Transformer Masked Language Model detects zero-day attacks by computing HTTP structure reconstruction loss without relying on static rule databases.
                 </p>
             </div>
 
-            <div class="glass-panel p-8 rounded-3xl space-y-4 hover:border-brand-500/40 transition-all">
-                <div class="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center text-xl">
+            <div class="glass-card p-8 rounded-3xl space-y-4">
+                <div class="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center text-2xl">
                     <i class="fas fa-robot"></i>
                 </div>
-                <h3 class="text-xl font-bold text-white">Qwen2.5 LLM Auto-Synthesizer</h3>
+                <h3 class="text-xl font-extrabold text-white">Qwen2.5 LLM Auto-Synthesizer</h3>
                 <p class="text-sm text-slate-400 leading-relaxed">
                     Synthesizes precise regex block rules from detected anomalies and hot-reloads them directly into Redis to guarantee instant edge mitigation.
                 </p>
+            </div>
+        </div>
+
+        <!-- SaaS Pricing Matrix -->
+        <div class="space-y-10 text-center">
+            <div class="space-y-3">
+                <span class="text-brand-500 font-bold text-xs uppercase tracking-widest">Flexible Cloud Plans</span>
+                <h2 class="text-4xl font-black text-white">Enterprise Security Pricing</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+                <!-- Developer Plan -->
+                <div class="glass-card p-8 rounded-3xl space-y-6 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <span class="px-3 py-1 rounded-full bg-slate-800 text-slate-400 text-xs font-bold uppercase">Developer</span>
+                        <div class="text-4xl font-black text-white">$0 <span class="text-sm font-normal text-slate-500">/ mo</span></div>
+                        <p class="text-xs text-slate-400 leading-relaxed">Free tier for development testing and small personal projects.</p>
+                        <ul class="space-y-3 text-xs text-slate-300">
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Up to 100K Requests / mo</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Stage 1 Redis Fast-Path</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Basic Telemetry Logs</li>
+                        </ul>
+                    </div>
+                    <a href="dashboard.html" class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs text-center transition-all">Get Started Free</a>
+                </div>
+
+                <!-- Business Pro Plan -->
+                <div class="glass-card p-8 rounded-3xl space-y-6 flex flex-col justify-between border-brand-500/50 shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-4 right-4 px-3 py-1 rounded-full bg-brand-500/20 text-brand-400 text-[10px] font-bold uppercase border border-brand-500/30">Popular</div>
+                    <div class="space-y-4">
+                        <span class="px-3 py-1 rounded-full bg-brand-500/20 text-brand-400 text-xs font-bold uppercase">Business Pro</span>
+                        <div class="text-4xl font-black text-white">$299 <span class="text-sm font-normal text-slate-500">/ mo</span></div>
+                        <p class="text-xs text-slate-400 leading-relaxed">Full autonomous WAF protection for high-traffic SaaS products.</p>
+                        <ul class="space-y-3 text-xs text-slate-300">
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Up to 10M Requests / mo</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> DistilBERT Transformer ML Engine</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Qwen2.5 LLM Auto-Rule Generator</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Real-time WebSocket Telemetry</li>
+                        </ul>
+                    </div>
+                    <a href="dashboard.html" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-500 to-amber-500 text-white font-bold text-xs text-center shadow-lg shadow-brand-500/30 transition-all">Start 14-Day Free Trial</a>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="glass-card p-8 rounded-3xl space-y-6 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs font-bold uppercase">Enterprise</span>
+                        <div class="text-4xl font-black text-white">Custom</div>
+                        <p class="text-xs text-slate-400 leading-relaxed">Dedicated cloud infrastructure with custom ML fine-tuning & SLA.</p>
+                        <ul class="space-y-3 text-xs text-slate-300">
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Unlimited Global Bandwidth</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Custom Model Fine-Tuning</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Dedicated SOC Support Analyst</li>
+                        </ul>
+                    </div>
+                    <a href="dashboard.html" class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs text-center transition-all">Contact Enterprise Sales</a>
+                </div>
             </div>
         </div>
 
