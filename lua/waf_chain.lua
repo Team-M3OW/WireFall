@@ -69,8 +69,11 @@ if mode == "full" and ok and combined_input ~= "" then
     local rules, err = red:smembers("waf:rules:regex")
     if rules then
         for _, rule in ipairs(rules) do
-            local clean_rule = rule:gsub("\\ ", " "):gsub("\\-", "-"):gsub("\\'", "'")
-            if ngx.re.find(combined_input, clean_rule, "ijo") or ngx.re.find(combined_input, rule, "ijo") then
+            local clean_rule = rule:gsub("^%(%?i%)", "")
+            local pcall_ok, matched = pcall(function()
+                return ngx.re.find(combined_input, clean_rule, "ijo") ~= nil
+            end)
+            if pcall_ok and matched then
                 ngx.log(ngx.INFO, "BLOCK: Stage 1 Regex Match: ", rule)
                 ngx.header.content_type = "text/html"
                 ngx.status = ngx.HTTP_FORBIDDEN
